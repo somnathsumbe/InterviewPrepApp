@@ -1,0 +1,197 @@
+{
+  "subject": "Advance JavaScript",
+  "version": 1,
+  "description": "Advance JavaScript interview preparation questions",
+  "questions": [
+    {
+      "id": "advance-javascript-001",
+      "category": "Closures",
+      "difficulty": "Advanced",
+      "question": "What is a closure in JavaScript?",
+      "options": [
+        "Function with remembered lexical scope",
+        "CSS selector",
+        "HTML element",
+        "JSON format"
+      ],
+      "answer": "A closure is a function bundled with references to its surrounding lexical environment, allowing it to access outer variables after the outer function has returned.",
+      "explanation": "Closures are important for private state, callbacks, factories and functional programming.",
+      "example": "function createCounter(){ let count=0; return ()=>++count; }",
+      "tags": [
+        "advance javascript",
+        "closures"
+      ]
+    },
+    {
+      "id": "advance-javascript-002",
+      "category": "Event Loop",
+      "difficulty": "Advanced",
+      "question": "Explain the JavaScript event loop.",
+      "options": [
+        "Coordinates stack and queues",
+        "CSS layout engine",
+        "Database engine",
+        "HTML parser"
+      ],
+      "answer": "The event loop coordinates synchronous execution with task and microtask queues. Promise callbacks run as microtasks before the next task such as a timer.",
+      "explanation": "This is critical for understanding asynchronous JavaScript and UI responsiveness.",
+      "example": "console.log('A'); setTimeout(()=>console.log('B')); Promise.resolve().then(()=>console.log('C')); console.log('D');",
+      "tags": [
+        "advance javascript",
+        "event-loop"
+      ]
+    },
+    {
+      "id": "advance-javascript-003",
+      "category": "Promises",
+      "difficulty": "Beginner",
+      "question": "What is the difference between Promise.all and Promise.allSettled?",
+      "options": [
+        "all fails fast; allSettled reports every result",
+        "They are identical",
+        "allSettled fails immediately",
+        "all only works with fetch"
+      ],
+      "answer": "Promise.all rejects when any input promise rejects. Promise.allSettled waits for all promises and returns each outcome as fulfilled or rejected.",
+      "explanation": "Use Promise.all when every result is required; use allSettled when you need a complete outcome report.",
+      "example": "await Promise.all([api1(),api2()]); await Promise.allSettled([api1(),api2()]);",
+      "tags": [
+        "advance javascript",
+        "promises"
+      ]
+    },
+    {
+      "id": "advance-javascript-004",
+      "category": "Async/Await",
+      "difficulty": "Advanced",
+      "question": "How does async/await work with error handling?",
+      "options": [
+        "Promise-based syntax with try/catch",
+        "Synchronous-only syntax",
+        "CSS feature",
+        "Database feature"
+      ],
+      "answer": "An async function returns a Promise. Await pauses that function until the promise settles, and try/catch can handle rejected promises.",
+      "explanation": "Avoid unnecessary sequential awaits when independent operations can run concurrently.",
+      "example": "try { const data=await fetchData(); } catch(error) { console.error(error); }",
+      "tags": [
+        "advance javascript",
+        "async/await"
+      ]
+    },
+    {
+      "id": "advance-javascript-005",
+      "category": "Prototype",
+      "difficulty": "Advanced",
+      "question": "What is the prototype chain?",
+      "options": [
+        "Object inheritance lookup chain",
+        "CSS inheritance",
+        "DOM tree only",
+        "JSON schema"
+      ],
+      "answer": "JavaScript objects can inherit properties and methods through their prototype links. Property lookup continues up the prototype chain until a match is found or the chain ends.",
+      "explanation": "Understanding prototypes helps with inheritance, classes and object behavior.",
+      "example": "const user={name:'A'}; console.log(Object.getPrototypeOf(user));",
+      "tags": [
+        "advance javascript",
+        "prototype"
+      ]
+    },
+    {
+      "id": "advance-javascript-006",
+      "category": "this",
+      "difficulty": "Beginner",
+      "question": "How is this determined in JavaScript?",
+      "options": [
+        "Mostly by how a function is called",
+        "Always by declaration",
+        "Always global",
+        "Only by TypeScript"
+      ],
+      "answer": "The value of this is determined by the call site for regular functions, while arrow functions capture this lexically from their surrounding scope.",
+      "explanation": "Explicit binding with call, apply or bind can control this for regular functions.",
+      "example": "const obj={name:'UI',show(){return this.name}}; obj.show();",
+      "tags": [
+        "advance javascript",
+        "this"
+      ]
+    },
+    {
+      "id": "advance-javascript-007",
+      "category": "Debounce",
+      "difficulty": "Intermediate",
+      "question": "What is debouncing and where is it useful?",
+      "options": [
+        "Delay until calls stop",
+        "Run every event immediately",
+        "Block the browser",
+        "Cache CSS"
+      ],
+      "answer": "Debouncing delays execution until calls stop for a specified period. It is useful for search inputs, resize events and other high-frequency UI events.",
+      "explanation": "It reduces unnecessary work while preserving the latest user action.",
+      "example": "let timer; input.oninput=e=>{clearTimeout(timer);timer=setTimeout(()=>search(e.target.value),300)};",
+      "tags": [
+        "advance javascript",
+        "debounce"
+      ]
+    },
+    {
+      "id": "advance-javascript-008",
+      "category": "Throttle",
+      "difficulty": "Advanced",
+      "question": "What is throttling?",
+      "options": [
+        "Limit execution frequency",
+        "Wait for all calls to finish",
+        "Serialize JSON",
+        "Create promises"
+      ],
+      "answer": "Throttling limits how frequently a function can execute during a continuous stream of events.",
+      "explanation": "It is useful for scroll, mousemove and resize-related work.",
+      "example": "window.addEventListener('scroll',throttle(updateUI,100));",
+      "tags": [
+        "advance javascript",
+        "throttle"
+      ]
+    },
+    {
+      "id": "advance-javascript-009",
+      "category": "Memory",
+      "difficulty": "Beginner",
+      "question": "What causes memory leaks in browser JavaScript?",
+      "options": [
+        "Unreleased references and resources",
+        "Too many CSS classes only",
+        "HTML tags",
+        "JSON strings"
+      ],
+      "answer": "Common causes include forgotten event listeners, timers, retained DOM references and subscriptions that are never cleaned up.",
+      "explanation": "Cleanup is especially important in long-lived SPAs and component-based applications.",
+      "example": "const handler=()=>{}; el.addEventListener('click',handler); el.removeEventListener('click',handler);",
+      "tags": [
+        "advance javascript",
+        "memory"
+      ]
+    },
+    {
+      "id": "advance-javascript-010",
+      "category": "Performance",
+      "difficulty": "Advanced",
+      "question": "How can you optimize JavaScript performance in a UI application?",
+      "options": [
+        "Profile and reduce unnecessary work",
+        "Always use setTimeout",
+        "Avoid all functions",
+        "Disable caching"
+      ],
+      "answer": "Measure first, then reduce unnecessary work using memoization where appropriate, event delegation, batching, lazy loading, efficient data structures and avoiding needless DOM updates.",
+      "explanation": "Performance optimization should be driven by profiling rather than assumptions.",
+      "example": "const fragment=document.createDocumentFragment(); items.forEach(renderItem); container.append(fragment);",
+      "tags": [
+        "advance javascript",
+        "performance"
+      ]
+    }
+  ]
+}

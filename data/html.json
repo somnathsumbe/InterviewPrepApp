@@ -1,0 +1,21 @@
+{
+  "subject": "HTML",
+  "version": 1,
+  "description": "HTML interview preparation questions",
+  "questions": [
+    {
+      "id": "html-001",
+      "category": "Basics",
+      "difficulty": "Intermediate",
+      "question": "What is HTML?",
+      "options": [],
+      "answer": "HTML stands for HyperText Markup Language. It is used to structure content on web pages.",
+      "explanation": "HTML defines the structure and meaning of page content using elements and attributes.",
+      "example": "<h1>Hello World</h1>",
+      "tags": [
+        "html",
+        "basics"
+      ]
+    }
+  ]
+}

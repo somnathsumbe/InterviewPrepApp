@@ -1,0 +1,35 @@
+{
+  "subject": "HR",
+  "version": 1,
+  "description": "HR interview preparation questions",
+  "questions": [
+    {
+      "id": "hr-001",
+      "category": "Introduction",
+      "difficulty": "Intermediate",
+      "question": "Tell me about yourself.",
+      "options": [],
+      "answer": "A strong answer should briefly cover your current role, relevant experience, key strengths, recent work and what you are looking for next.",
+      "explanation": "Keep the answer structured and aligned with the job description.",
+      "example": "Present â†’ Experience â†’ Strengths â†’ Current work â†’ Career goal",
+      "tags": [
+        "hr",
+        "introduction"
+      ]
+    },
+    {
+      "id": "hr-002",
+      "category": "Behavioral",
+      "difficulty": "Beginner",
+      "question": "Why should we hire you?",
+      "options": [],
+      "answer": "Focus on relevant technical strengths, problem-solving ability, ownership, collaboration and measurable impact.",
+      "explanation": "Avoid generic claims; connect your strengths to the role.",
+      "example": "My strengths + evidence + value I can bring",
+      "tags": [
+        "hr",
+        "behavioral"
+      ]
+    }
+  ]
+}

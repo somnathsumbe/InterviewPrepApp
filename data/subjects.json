@@ -1,0 +1,110 @@
+[
+  {
+    "id": "html",
+    "name": "HTML",
+    "file": "html.json",
+    "icon": "🌐"
+  },
+  {
+    "id": "css",
+    "name": "CSS",
+    "file": "css.json",
+    "icon": "🎨"
+  },
+  {
+    "id": "bootstrap5",
+    "name": "Bootstrap 5",
+    "file": "bootstrap5.json",
+    "icon": "🅱️"
+  },
+  {
+    "id": "scss",
+    "name": "SCSS",
+    "file": "scss.json",
+    "icon": "🧩"
+  },
+  {
+    "id": "tailwind-css",
+    "name": "Tailwind CSS",
+    "file": "tailwind-css.json",
+    "icon": "💨"
+  },
+  {
+    "id": "advance-javascript",
+    "name": "Advance JavaScript",
+    "file": "advance-javascript.json",
+    "icon": "⚡"
+  },
+  {
+    "id": "es6",
+    "name": "ES6",
+    "file": "es6.json",
+    "icon": "✨"
+  },
+  {
+    "id": "json",
+    "name": "JSON",
+    "file": "json.json",
+    "icon": "🧾"
+  },
+  {
+    "id": "angular20",
+    "name": "Angular 20",
+    "file": "angular20.json",
+    "icon": "🅰️"
+  },
+  {
+    "id": "react",
+    "name": "React.js",
+    "file": "react.json",
+    "icon": "⚛️"
+  },
+  {
+    "id": "nextjs",
+    "name": "Next.js",
+    "file": "nextjs.json",
+    "icon": "▲"
+  },
+  {
+    "id": "typescript",
+    "name": "TypeScript",
+    "file": "typescript.json",
+    "icon": "🔷"
+  },
+  {
+    "id": "rxjs-toolkit",
+    "name": "RxJS Toolkit",
+    "file": "rxjs-toolkit.json",
+    "icon": "📡"
+  },
+  {
+    "id": "javascript-example",
+    "name": "JavaScript Example",
+    "file": "javascript-example.json",
+    "icon": "🧠"
+  },
+  {
+    "id": "nodejs",
+    "name": "Node.js",
+    "file": "nodejs.json",
+    "icon": "🟢"
+  },
+  {
+    "id": "mongodb",
+    "name": "MongoDB",
+    "file": "mongodb.json",
+    "icon": "🍃"
+  },
+  {
+    "id": "hr",
+    "name": "HR",
+    "file": "hr.json",
+    "icon": "🤝"
+  },
+  {
+    "id": "core-javascript",
+    "name": "Core JavaScript",
+    "file": "core-javascript.json",
+    "icon": "🧠"
+  }
+]

@@ -1,0 +1,21 @@
+{
+  "subject": "Angular 20",
+  "version": 1,
+  "description": "Angular 20 interview preparation questions",
+  "questions": [
+    {
+      "id": "angular20-001",
+      "category": "Modern Angular",
+      "difficulty": "Advanced",
+      "question": "What are Angular Signals?",
+      "options": [],
+      "answer": "Signals are reactive primitives used to represent state and track dependencies so Angular can update consumers efficiently.",
+      "explanation": "Signals provide a fine-grained reactive model and work well with modern Angular applications.",
+      "example": "const count = signal(0); count.set(1);",
+      "tags": [
+        "angular20",
+        "modern-angular"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "subject": "Next.js",
+  "version": 1,
+  "description": "Next.js interview preparation questions",
+  "questions": [
+    {
+      "id": "nextjs-001",
+      "category": "App Router",
+      "difficulty": "Intermediate",
+      "question": "What is a Server Component in Next.js?",
+      "options": [
+        "Renders on the server by default",
+        "Only renders in CSS",
+        "Is a database component",
+        "Is always client-side"
+      ],
+      "answer": "A Server Component renders on the server by default and can access server-side resources without sending its component JavaScript to the browser.",
+      "explanation": "This can reduce client-side JavaScript and improve performance.",
+      "example": "export default async function Page(){ return <main>Server UI</main>; }",
+      "tags": [
+        "nextjs",
+        "app-router"
+      ]
+    }
+  ]
+}

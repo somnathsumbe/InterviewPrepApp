@@ -1,0 +1,26 @@
+{
+  "subject": "CSS",
+  "version": 1,
+  "description": "CSS interview preparation questions",
+  "questions": [
+    {
+      "id": "css-001",
+      "category": "Layout",
+      "difficulty": "Intermediate",
+      "question": "What is CSS Flexbox?",
+      "options": [
+        "A layout system",
+        "A programming language",
+        "A database",
+        "An HTML parser"
+      ],
+      "answer": "Flexbox is a one-dimensional CSS layout system for arranging items in a row or column.",
+      "explanation": "It is useful for alignment, distribution and responsive component layouts.",
+      "example": ".container { display:flex; justify-content:space-between; }",
+      "tags": [
+        "css",
+        "layout"
+      ]
+    }
+  ]
+}

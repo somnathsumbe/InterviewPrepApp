@@ -1,0 +1,26 @@
+{
+  "subject": "RxJS Toolkit",
+  "version": 1,
+  "description": "RxJS Toolkit interview preparation questions",
+  "questions": [
+    {
+      "id": "rxjs-toolkit-001",
+      "category": "Reactive",
+      "difficulty": "Advanced",
+      "question": "What is an RxJS Observable?",
+      "options": [
+        "Stream of values over time",
+        "CSS selector",
+        "Database table",
+        "HTML tag"
+      ],
+      "answer": "An Observable represents a stream of values over time and allows operators to compose asynchronous or event-based logic.",
+      "explanation": "It is widely used in Angular for HTTP, events and reactive state flows.",
+      "example": "source$.pipe(map(x=>x*2), filter(x=>x>10));",
+      "tags": [
+        "rxjs toolkit",
+        "reactive"
+      ]
+    }
+  ]
+}

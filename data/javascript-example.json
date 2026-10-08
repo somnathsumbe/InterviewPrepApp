@@ -1,0 +1,26 @@
+{
+  "subject": "JavaScript Example",
+  "version": 1,
+  "description": "JavaScript Example interview preparation questions",
+  "questions": [
+    {
+      "id": "javascript-example-001",
+      "category": "Practical",
+      "difficulty": "Advanced",
+      "question": "How do you debounce a search input in JavaScript?",
+      "options": [
+        "Delay until calls stop",
+        "Run on every keystroke",
+        "Reload the page",
+        "Block all events"
+      ],
+      "answer": "Debouncing delays execution until a specified period has passed without another call.",
+      "explanation": "It is useful for search boxes, resize handlers and other high-frequency events.",
+      "example": "let timer; input.addEventListener('input',e=>{ clearTimeout(timer); timer=setTimeout(()=>search(e.target.value),300); });",
+      "tags": [
+        "javascript example",
+        "practical"
+      ]
+    }
+  ]
+}

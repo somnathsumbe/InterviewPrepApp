@@ -1,0 +1,26 @@
+{
+  "subject": "Node.js",
+  "version": 1,
+  "description": "Node.js interview preparation questions",
+  "questions": [
+    {
+      "id": "nodejs-001",
+      "category": "Backend",
+      "difficulty": "Intermediate",
+      "question": "What is Node.js?",
+      "options": [
+        "JavaScript runtime",
+        "CSS framework",
+        "Database",
+        "Browser"
+      ],
+      "answer": "Node.js is a JavaScript runtime built on the V8 engine that lets JavaScript run outside the browser.",
+      "explanation": "It is commonly used for APIs, backend services, tooling and real-time applications.",
+      "example": "import http from 'node:http'; http.createServer((req,res)=>res.end('OK')).listen(3000);",
+      "tags": [
+        "nodejs",
+        "backend"
+      ]
+    }
+  ]
+}

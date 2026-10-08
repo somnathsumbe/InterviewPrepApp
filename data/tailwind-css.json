@@ -1,0 +1,26 @@
+{
+  "subject": "Tailwind CSS",
+  "version": 1,
+  "description": "Tailwind CSS interview preparation questions",
+  "questions": [
+    {
+      "id": "tailwind-css-001",
+      "category": "Utilities",
+      "difficulty": "Intermediate",
+      "question": "What is Tailwind CSS?",
+      "options": [
+        "Utility-first CSS framework",
+        "JavaScript runtime",
+        "Database",
+        "Template engine"
+      ],
+      "answer": "Tailwind CSS is a utility-first CSS framework that provides low-level utility classes for building custom interfaces.",
+      "explanation": "It promotes composition directly in markup and can be optimized by removing unused classes.",
+      "example": "<button class=\"px-4 py-2 rounded-lg font-semibold\">Save</button>",
+      "tags": [
+        "tailwind css",
+        "utilities"
+      ]
+    }
+  ]
+}

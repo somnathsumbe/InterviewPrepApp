@@ -1,0 +1,26 @@
+{
+  "subject": "TypeScript",
+  "version": 1,
+  "description": "TypeScript interview preparation questions",
+  "questions": [
+    {
+      "id": "typescript-001",
+      "category": "Types",
+      "difficulty": "Intermediate",
+      "question": "What is TypeScript?",
+      "options": [
+        "Typed superset of JavaScript",
+        "CSS framework",
+        "Database",
+        "Browser"
+      ],
+      "answer": "TypeScript is a typed superset of JavaScript that adds static type checking and compiles to JavaScript.",
+      "explanation": "It improves maintainability and tooling for large applications.",
+      "example": "interface User { name:string; age:number; }",
+      "tags": [
+        "typescript",
+        "types"
+      ]
+    }
+  ]
+}

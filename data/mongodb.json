@@ -1,0 +1,26 @@
+{
+  "subject": "MongoDB",
+  "version": 1,
+  "description": "MongoDB interview preparation questions",
+  "questions": [
+    {
+      "id": "mongodb-001",
+      "category": "Database",
+      "difficulty": "Intermediate",
+      "question": "What is MongoDB?",
+      "options": [
+        "Document-oriented NoSQL database",
+        "CSS preprocessor",
+        "JavaScript compiler",
+        "Browser API"
+      ],
+      "answer": "MongoDB is a document-oriented NoSQL database that stores data in flexible BSON documents.",
+      "explanation": "It is commonly used with Node.js applications and supports indexing, aggregation and replication.",
+      "example": "db.users.find({active:true}).sort({createdAt:-1});",
+      "tags": [
+        "mongodb",
+        "database"
+      ]
+    }
+  ]
+}

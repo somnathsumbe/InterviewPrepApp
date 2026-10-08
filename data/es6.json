@@ -1,0 +1,26 @@
+{
+  "subject": "ES6",
+  "version": 1,
+  "description": "ES6 interview preparation questions",
+  "questions": [
+    {
+      "id": "es6-001",
+      "category": "Modern JS",
+      "difficulty": "Intermediate",
+      "question": "What is the difference between let and const?",
+      "options": [
+        "let can be reassigned; const cannot",
+        "Both are function scoped",
+        "const is always immutable",
+        "There is no difference"
+      ],
+      "answer": "Both are block scoped. A let binding can be reassigned, while a const binding cannot be reassigned.",
+      "explanation": "const does not make objects immutable; their properties can still be changed.",
+      "example": "let count = 1; count = 2; const name = 'Interview';",
+      "tags": [
+        "es6",
+        "modern-js"
+      ]
+    }
+  ]
+}

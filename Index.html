@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Personal interview practice app for technical and HR questions.">
+  <meta name="theme-color" content="#0d6efd">
+  <title>Interview Prep</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="stylesheet" href="./css/app.css">
+  <link rel="stylesheet" href="./css/themes.css">
+  <link rel="stylesheet" href="./css/responsive.css">
+</head>
+<body>
+  <div id="app">
+    <div class="wrap">
+      <header class="top">
+        <div class="toprow">
+          <div>
+            <div class="brand">🎯 Interview Prep</div>
+            <small>Read • Listen • Practice</small>
+          </div>
+          <button id="themeButton" type="button" aria-label="Toggle theme">🌙</button>
+        </div>
+      </header>
+
+      <main>
+        <section id="home-view" class="view">
+          <div class="hero">
+            <h1>Choose Technology</h1>
+            <p class="muted">Select a technology and practice questions one by one.</p>
+          </div>
+          <div id="techGrid" class="grid" aria-live="polite"></div>
+        </section>
+
+        <section id="practice-view" class="view hidden">
+          <div class="toolbar actions">
+            <div class="actions">
+              <button id="backToHome" type="button">← Technologies</button>
+              <span id="techName" class="muted"></span>
+            </div>
+            <div class="actions">
+              <button id="autoReadToggle" type="button" aria-pressed="false">🔊 Auto Read: OFF</button>
+            </div>
+          </div>
+
+          <div class="searchbox">
+            <label for="searchInput" class="sr-only">Search questions</label>
+            <input id="searchInput" type="search" placeholder="🔎 Search question, answer, keyword..." autocomplete="off">
+            <div id="searchResults" class="search-results hidden" role="listbox" aria-live="polite"></div>
+          </div>
+
+          <div class="tools">
+            <button id="randomBtn" type="button">🎲 Random</button>
+            <button id="bookmarksBtn" type="button">🔖 Bookmarked</button>
+            <button id="weakFilterBtn" type="button">⚠️ Weak</button>
+            <button id="allQuestionsBtn" type="button">📚 All</button>
+          </div>
+
+          <div class="progress">
+            <i id="progressBar" class="progress-bar"></i>
+          </div>
+
+          <div class="toprow">
+            <small id="questionCounter"></small>
+            <span id="questionCategory" class="badge"></span>
+          </div>
+
+          <article class="card question" aria-live="polite">
+            <div class="toprow">
+              <div class="muted">INTERVIEW QUESTION</div>
+              <div class="actions">
+                <button id="bookmarkBtn" type="button">🔖 Bookmark</button>
+                <button id="weakQuestionBtn" type="button" aria-pressed="false">⚠️ Mark Weak</button>
+              </div>
+            </div>
+
+            <div class="practice-meta">
+              <span id="difficultyBadge" class="difficulty-badge"></span>
+              <span id="statusBadge" class="difficulty-badge"></span>
+            </div>
+
+            <h2 id="questionText"></h2>
+            <div id="optionsContainer" class="options"></div>
+
+            <div id="answerBlock" class="answer">
+              <strong>✅ Answer</strong>
+              <div id="answerText"></div>
+              <span id="explanationText" class="explanation"></span>
+            </div>
+
+            <div id="exampleWrap" class="hidden">
+              <div style="margin:16px 0 8px;font-weight:700;">💻 Example</div>
+              <pre id="exampleText" class="code"></pre>
+            </div>
+          </article>
+
+          <div class="nav">
+            <button id="prevBtn" type="button">← Previous</button>
+            <button id="readBtn" class="primary" type="button">🔊 Read</button>
+            <button id="nextBtn" class="primary" type="button">Next →</button>
+          </div>
+
+          <div class="actions readbar">
+            <button id="stopBtn" type="button">■ Stop Reading</button>
+          </div>
+        </section>
+
+        <section id="summary-view" class="card summary hidden">
+          <div class="big">🎉</div>
+          <h2>Practice Completed</h2>
+          <p id="summaryText" class="muted"></p>
+          <div class="summary-actions">
+            <button id="practiceAgainBtn" class="primary" type="button">Practice Again</button>
+            <button id="backToHomeBtn" type="button">Back to Technologies</button>
+          </div>
+        </section>
+
+        <div id="loadingState" class="loading hidden" role="status" aria-live="polite">
+          <span class="spinner" aria-hidden="true"></span><span id="loadingText">Loading questions...</span>
+        </div>
+
+        <div id="errorState" class="error hidden" role="alert">
+          <span id="errorText">Unable to load questions. Please try again.</span>
+          <button id="retryButton" type="button" style="margin-left:10px;">Retry</button>
+        </div>
+      </main>
+
+      <footer class="footer">Personal interview practice • JSON-based question bank • Browser Text-to-Speech</footer>
+    </div>
+  </div>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>

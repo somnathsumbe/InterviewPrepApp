@@ -1,0 +1,67 @@
+{
+  "subject": "JSON",
+  "version": 1,
+  "description": "JSON interview preparation questions",
+  "questions": [
+    {
+      "id": "json-001",
+      "category": "Data Format",
+      "difficulty": "Beginner",
+      "question": "What is JSON?",
+      "options": [
+        "JavaScript Object Notation",
+        "Java Script Only Notation",
+        "JavaScript Output Network",
+        "JavaScript Oriented Network"
+      ],
+      "answer": "JavaScript Object Notation",
+      "explanation": "JSON is a lightweight, text-based format for structured data exchange.",
+      "example": "{\"name\":\"Asha\",\"role\":\"Developer\"}",
+      "tags": [
+        "json",
+        "data",
+        "api"
+      ]
+    },
+    {
+      "id": "json-002",
+      "category": "Parsing",
+      "difficulty": "Intermediate",
+      "question": "How do you parse JSON in JavaScript?",
+      "options": [
+        "JSON.parse()",
+        "JSON.stringify()",
+        "parseJSON()",
+        "stringifyJSON()"
+      ],
+      "answer": "JSON.parse()",
+      "explanation": "JSON.parse converts a JSON string into a JavaScript value.",
+      "example": "const obj = JSON.parse(\"{\\\"name\\\":\\\"Asha\\\"}\");",
+      "tags": [
+        "json",
+        "javascript",
+        "parse"
+      ]
+    },
+    {
+      "id": "json-003",
+      "category": "Serialization",
+      "difficulty": "Intermediate",
+      "question": "Why is JSON.stringify useful?",
+      "options": [
+        "It converts JS values into a JSON string",
+        "It validates HTML",
+        "It compiles CSS",
+        "It fetches API data"
+      ],
+      "answer": "It converts JS values into a JSON string",
+      "explanation": "JSON.stringify is commonly used before sending data to a server or saving it to storage.",
+      "example": "const text = JSON.stringify({ name: \"Asha\" });",
+      "tags": [
+        "json",
+        "serialization",
+        "storage"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "subject": "Core JavaScript",
+  "version": 1,
+  "description": "Core JavaScript interview preparation questions",
+  "questions": [
+    {
+      "id": "core-javascript-001",
+      "category": "Core",
+      "difficulty": "Intermediate",
+      "question": "What is the JavaScript event loop?",
+      "options": [
+        "Async scheduling mechanism",
+        "CSS layout system",
+        "Database query engine",
+        "HTML parser"
+      ],
+      "answer": "The event loop coordinates the call stack and task queues so asynchronous callbacks can be processed without blocking the main JavaScript execution model.",
+      "explanation": "Understanding the event loop is important for promises, timers and UI performance.",
+      "example": "console.log('start'); Promise.resolve().then(()=>console.log('microtask')); console.log('end');",
+      "tags": [
+        "core javascript",
+        "core"
+      ]
+    }
+  ]
+}

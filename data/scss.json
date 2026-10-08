@@ -1,0 +1,26 @@
+{
+  "subject": "SCSS",
+  "version": 1,
+  "description": "SCSS interview preparation questions",
+  "questions": [
+    {
+      "id": "scss-001",
+      "category": "Sass",
+      "difficulty": "Intermediate",
+      "question": "What is SCSS?",
+      "options": [
+        "CSS preprocessor syntax",
+        "JavaScript framework",
+        "Database language",
+        "HTML parser"
+      ],
+      "answer": "SCSS is the CSS-compatible syntax of Sass. It adds features such as variables, nesting, mixins and functions.",
+      "explanation": "SCSS compiles to standard CSS and helps organize scalable stylesheets.",
+      "example": "$primary: #0d6efd; .button { color:$primary; }",
+      "tags": [
+        "scss",
+        "sass"
+      ]
+    }
+  ]
+}

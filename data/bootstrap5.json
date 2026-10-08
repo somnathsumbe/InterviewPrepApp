@@ -1,0 +1,26 @@
+{
+  "subject": "Bootstrap 5",
+  "version": 1,
+  "description": "Bootstrap 5 interview preparation questions",
+  "questions": [
+    {
+      "id": "bootstrap5-001",
+      "category": "Grid",
+      "difficulty": "Intermediate",
+      "question": "What is the Bootstrap 5 grid system?",
+      "options": [
+        "12-column responsive grid",
+        "5-column grid",
+        "Only flexbox utility",
+        "Database grid"
+      ],
+      "answer": "Bootstrap 5 uses a responsive 12-column grid with containers, rows and columns.",
+      "explanation": "The grid makes responsive page layouts easier to build.",
+      "example": "<div class=\"row\"><div class=\"col-md-6\">Content</div></div>",
+      "tags": [
+        "bootstrap5",
+        "grid"
+      ]
+    }
+  ]
+}

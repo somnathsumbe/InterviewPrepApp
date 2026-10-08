@@ -1,0 +1,26 @@
+{
+  "subject": "React.js",
+  "version": 1,
+  "description": "React.js interview preparation questions",
+  "questions": [
+    {
+      "id": "react-001",
+      "category": "Hooks",
+      "difficulty": "Intermediate",
+      "question": "What is useMemo used for?",
+      "options": [
+        "Memoize calculated values",
+        "Fetch APIs only",
+        "Create CSS",
+        "Navigate routes"
+      ],
+      "answer": "useMemo memoizes a calculated value and can avoid repeating expensive calculations when dependencies have not changed.",
+      "explanation": "It should be used for meaningful optimization, not automatically everywhere.",
+      "example": "const total = useMemo(() => calculate(items), [items]);",
+      "tags": [
+        "react",
+        "hooks"
+      ]
+    }
+  ]
+}

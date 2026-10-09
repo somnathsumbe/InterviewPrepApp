@@ -78,7 +78,15 @@ export function renderPractice() {
   document.getElementById('questionCategory').textContent = question.category || 'General';
   document.getElementById('techName').textContent = subjectName;
   document.getElementById('questionText').textContent = question.question;
-  document.getElementById('answerText').textContent = question.answer;
+  document.getElementById('answerText').textContent = question.answer || '';
+  const marathiWrap = document.getElementById('marathiAnswerWrap');
+  if (marathiWrap) {
+    marathiWrap.classList.toggle('hidden', !question.answerMarathi);
+  }
+  const marathiAnswerText = document.getElementById('answerTextMarathi');
+  if (marathiAnswerText) {
+    marathiAnswerText.textContent = question.answerMarathi || '';
+  }
   document.getElementById('explanationText').textContent = question.explanation;
   document.getElementById('optionsContainer').innerHTML = renderOptions(question);
   document.getElementById('exampleWrap').classList.toggle('hidden', !question.example);

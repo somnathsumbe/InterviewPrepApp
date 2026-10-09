@@ -9,27 +9,200 @@
       "difficulty": "Intermediate",
       "question": "Tell me about yourself.",
       "options": [],
-      "answer": "A strong answer should briefly cover your current role, relevant experience, key strengths, recent work and what you are looking for next.",
-      "explanation": "Keep the answer structured and aligned with the job description.",
-      "example": "Present â†’ Experience â†’ Strengths â†’ Current work â†’ Career goal",
-      "tags": [
-        "hr",
-        "introduction"
-      ]
+      "answer": "Hi, I'm Somnath Sumbe from Pune. I have an MCA in Computer Science and 11+ years of experience in Frontend Development with React.js, Angular, Vue.js, and Next.js. I build responsive, user-friendly, high-performance web applications. I enjoy solving complex UI challenges and learning new technologies. I come from a family of five, including my parents, my wife, and my son.",
+      "answerMarathi": "नमस्कार, मी सोमनाथ सुम्बे, पुण्याहून आहे. मी कॉम्प्युटर सायन्समध्ये MCA पूर्ण केले आहे आणि Frontend Development मध्ये 11+ वर्षांचा अनुभव आहे. React.js, Angular, Vue.js आणि Next.js या तंत्रज्ञानांचा वापर करून मी responsive, user-friendly आणि high-performance वेब अॅप्लिकेशन्स तयार करतो. मला complex UI challenges सोडवायला आणि नवीन तंत्रज्ञान शिकायला आवडते. माझ्या कुटुंबात पाच सदस्य आहेत: माझे आई-वडील, पत्नी आणि मुलगा.",
+      "tags": ["hr", "introduction"]
     },
     {
       "id": "hr-002",
-      "category": "Behavioral",
-      "difficulty": "Beginner",
-      "question": "Why should we hire you?",
+      "category": "Motivation",
+      "difficulty": "Intermediate",
+      "question": "Why do you want to work at our company?",
       "options": [],
-      "answer": "Focus on relevant technical strengths, problem-solving ability, ownership, collaboration and measurable impact.",
-      "explanation": "Avoid generic claims; connect your strengths to the role.",
-      "example": "My strengths + evidence + value I can bring",
-      "tags": [
-        "hr",
-        "behavioral"
-      ]
+      "answer": "Sir, it would be a great privilege to work for a reputed company like yours. My skills and experience match your requirements, and I see this opportunity as a chance to showcase my expertise and contribute to the company's growth.",
+      "answerMarathi": "सर, आपल्यासारख्या प्रतिष्ठित कंपनीत काम करण्याची संधी मिळणे माझ्यासाठी सन्मानाची गोष्ट असेल. माझी कौशल्ये आणि अनुभव आपल्या आवश्यकतांशी जुळतात. माझे कौशल्य दाखवण्याची आणि कंपनीच्या प्रगतीत योगदान देण्याची ही एक उत्तम संधी आहे.",
+      "tags": ["hr", "motivation"]
+    },
+    {
+      "id": "hr-003",
+      "category": "Strengths",
+      "difficulty": "Beginner",
+      "question": "What are your strengths?",
+      "options": [],
+      "answer": "I am honest, hardworking, and self-motivated. I am adaptable and flexible, can make quick decisions, and always try to remain positive and persistent.",
+      "answerMarathi": "मी प्रामाणिक, मेहनती आणि स्वतःहून प्रेरित होऊन काम करणारा आहे. मी परिस्थितीनुसार स्वतःला जुळवून घेतो, लवचिकपणे काम करतो, योग्य वेळी निर्णय घेतो आणि नेहमी सकारात्मक व चिकाटीने काम करण्याचा प्रयत्न करतो.",
+      "tags": ["hr", "strengths"]
+    },
+    {
+      "id": "hr-004",
+      "category": "Weaknesses",
+      "difficulty": "Intermediate",
+      "question": "What are your weaknesses?",
+      "options": [],
+      "answer": "Sometimes I find it difficult to say no, trust people too quickly, or become impatient. However, I am actively working on setting better boundaries, evaluating situations carefully, and improving my patience.",
+      "answerMarathi": "कधीकधी मला एखाद्या गोष्टीला नकार देणे कठीण जाते, मी लोकांवर लवकर विश्वास ठेवतो किंवा थोडा अधीर होतो. मात्र, योग्य मर्यादा ठरवणे, परिस्थितीचा विचारपूर्वक आढावा घेणे आणि संयम वाढवणे यावर मी काम करत आहे.",
+      "tags": ["hr", "weaknesses"]
+    },
+    {
+      "id": "hr-005",
+      "category": "Hiring",
+      "difficulty": "Intermediate",
+      "question": "Why should I hire you?",
+      "options": [],
+      "answer": "With 11+ years of experience, I have the skills and knowledge to deliver high-quality, user-friendly applications. I am hardworking, self-motivated, and committed to meeting deadlines. I can contribute effectively to your team and the company's growth.",
+      "answerMarathi": "11+ वर्षांच्या अनुभवामुळे माझ्याकडे दर्जेदार आणि user-friendly अॅप्लिकेशन्स तयार करण्यासाठी आवश्यक कौशल्ये आणि ज्ञान आहे. मी मेहनती, स्वतःहून प्रेरित होऊन काम करणारा आणि वेळेचे पालन करणारा आहे. मी आपल्या टीमला आणि कंपनीच्या प्रगतीला प्रभावी योगदान देऊ शकतो.",
+      "tags": ["hr", "hiring"]
+    },
+    {
+      "id": "hr-006",
+      "category": "Company Knowledge",
+      "difficulty": "Intermediate",
+      "question": "What do you know about our company?",
+      "options": [],
+      "answer": "Sir, your company has a strong reputation and offers opportunities for professional growth. I understand that a supportive work environment and collaboration are important to your organization. I see this as an opportunity to apply my skills and contribute to the company's success.",
+      "answerMarathi": "सर, आपल्या कंपनीची चांगली प्रतिष्ठा आहे आणि येथे व्यावसायिक प्रगतीच्या संधी उपलब्ध आहेत. सहकार्याची भावना आणि मदत करणारे कामाचे वातावरण आपल्या संस्थेसाठी महत्त्वाचे आहे, असे मला वाटते. माझ्या कौशल्यांचा उपयोग करून कंपनीच्या यशात योगदान देण्याची ही एक चांगली संधी आहे.",
+      "tags": ["hr", "company-knowledge"]
+    },
+    {
+      "id": "hr-007",
+      "category": "Career Change",
+      "difficulty": "Intermediate",
+      "question": "Why are you looking for a job change?",
+      "options": [],
+      "answer": "I am thankful to my previous organization for the learning and experience it provided. I am now looking for new challenges, opportunities to improve my skills, and professional growth. I believe this role will allow me to learn more and make a meaningful contribution.",
+      "answerMarathi": "माझ्या मागील कंपनीने दिलेल्या शिकण्याच्या संधी आणि अनुभवाबद्दल मी आभारी आहे. आता मला नवीन आव्हाने स्वीकारायची आहेत, माझी कौशल्ये अधिक सुधारायची आहेत आणि व्यावसायिक प्रगती साधायची आहे. या पदामुळे मला अधिक शिकता येईल आणि अर्थपूर्ण योगदान देता येईल, असा मला विश्वास आहे.",
+      "tags": ["hr", "job-change"]
+    },
+    {
+      "id": "hr-008",
+      "category": "Salary",
+      "difficulty": "Intermediate",
+      "question": "What are your salary requirements?",
+      "options": [],
+      "answer": "Sir, while compensation is important, I also value professional growth and the opportunity to contribute to the company. With my 11+ years of experience, I expect a competitive salary that reflects my skills, experience, and the responsibilities of the role. I am open to discussion.",
+      "answerMarathi": "सर, पगार महत्त्वाचा असला तरी व्यावसायिक प्रगती आणि कंपनीसाठी योगदान देण्याची संधी यांनाही मी महत्त्व देतो. माझा 11+ वर्षांचा अनुभव, कौशल्ये आणि या पदाच्या जबाबदाऱ्या लक्षात घेता, मला योग्य आणि स्पर्धात्मक पगार अपेक्षित आहे. याबाबत चर्चा करण्यास मी तयार आहे.",
+      "tags": ["hr", "salary"]
+    },
+    {
+      "id": "hr-009",
+      "category": "Career Goals",
+      "difficulty": "Beginner",
+      "question": "What are your career goals?",
+      "options": [],
+      "answer": "My short-term goal is to work with a reputed organization where I can use my skills, take on new challenges, and grow professionally. My long-term goal is to take on greater responsibilities and contribute significantly to the company's success.",
+      "answerMarathi": "माझे अल्पकालीन उद्दिष्ट म्हणजे प्रतिष्ठित कंपनीत काम करून माझ्या कौशल्यांचा उपयोग करणे, नवीन आव्हाने स्वीकारणे आणि व्यावसायिक प्रगती साधणे. माझे दीर्घकालीन उद्दिष्ट अधिक जबाबदाऱ्या स्वीकारून कंपनीच्या यशात महत्त्वपूर्ण योगदान देणे आहे.",
+      "tags": ["hr", "career-goals"]
+    },
+    {
+      "id": "hr-010",
+      "category": "Project Experience",
+      "difficulty": "Advanced",
+      "question": "Describe a challenging project you worked on.",
+      "options": [],
+      "answer": "I worked on a slow web application and improved its performance using techniques such as lazy loading and rendering optimization. I identified performance bottlenecks, optimized the application, and tested the changes to improve the user experience. This experience taught me the importance of performance optimization and user experience.",
+      "answerMarathi": "मी एका संथ वेब अॅप्लिकेशनवर काम केले आणि lazy loading व rendering optimization यांसारख्या तंत्रांचा वापर करून त्याची कामगिरी सुधारली. मी performance मधील अडथळे ओळखले, अॅप्लिकेशन optimize केले आणि वापरकर्त्यांचा अनुभव सुधारण्यासाठी बदलांची चाचणी घेतली. या अनुभवातून मला performance optimization आणि user experience यांचे महत्त्व समजले.",
+      "tags": ["hr", "project-experience", "performance"]
+    },
+    {
+      "id": "hr-011",
+      "category": "Time Management",
+      "difficulty": "Intermediate",
+      "question": "How do you handle tight deadlines?",
+      "options": [],
+      "answer": "I break tasks into smaller modules, prioritize critical tasks, and create a clear execution plan. I communicate regularly with the team and stakeholders to track progress, resolve blockers, and meet deadlines without compromising quality.",
+      "answerMarathi": "मी कामाचे छोटे modules तयार करतो, महत्त्वाच्या कामांना प्राधान्य देतो आणि स्पष्ट कृती आराखडा बनवतो. प्रगतीचा आढावा घेण्यासाठी, अडचणी दूर करण्यासाठी आणि कामाचा दर्जा कायम ठेवून डेडलाइन पूर्ण करण्यासाठी मी टीम व stakeholders सोबत नियमित संवाद साधतो.",
+      "tags": ["hr", "deadlines", "time-management"]
+    },
+    {
+      "id": "hr-012",
+      "category": "Learning",
+      "difficulty": "Beginner",
+      "question": "How do you keep yourself updated with new technologies?",
+      "options": [],
+      "answer": "I follow technical blogs and official documentation, take online courses, attend webinars, and experiment with side projects. I also explore new tools and frameworks to understand how they can improve application quality and performance.",
+      "answerMarathi": "मी तांत्रिक blogs आणि अधिकृत documentation वाचतो, online courses करतो, webinars मध्ये सहभागी होतो आणि side projects वर प्रयोग करतो. अॅप्लिकेशनचा दर्जा आणि performance सुधारण्यासाठी नवीन tools व frameworks चा अभ्यासही करतो.",
+      "tags": ["hr", "learning", "technology"]
+    },
+    {
+      "id": "hr-013",
+      "category": "Conflict Resolution",
+      "difficulty": "Intermediate",
+      "question": "Describe a conflict in your team and how you resolved it.",
+      "options": [],
+      "answer": "When a disagreement occurs, I listen to both sides, understand the underlying concerns, and encourage an open discussion. I suggest a solution based on project requirements and technical considerations. This approach helps the team reach an agreement and continue working smoothly.",
+      "answerMarathi": "टीममध्ये मतभेद झाल्यास मी दोन्ही बाजूंचे म्हणणे ऐकतो, त्यामागील कारणे समजून घेतो आणि मोकळ्या चर्चेला प्रोत्साहन देतो. प्रोजेक्टच्या गरजा आणि तांत्रिक बाबी लक्षात घेऊन उपाय सुचवतो. यामुळे टीममध्ये सहमती निर्माण होते आणि काम सुरळीत सुरू राहते.",
+      "tags": ["hr", "conflict-resolution", "teamwork"]
+    },
+    {
+      "id": "hr-014",
+      "category": "Planning",
+      "difficulty": "Intermediate",
+      "question": "How do you prioritize tasks in a project?",
+      "options": [],
+      "answer": "I evaluate tasks based on business impact, deadlines, dependencies, and technical risks. I prioritize high-impact tasks, discuss priorities with the team, and plan work in manageable sprints. I review priorities regularly when requirements change.",
+      "answerMarathi": "मी व्यवसायावरील परिणाम, डेडलाइन, dependencies आणि तांत्रिक जोखीम यांच्या आधारे कामांचे मूल्यमापन करतो. महत्त्वाच्या कामांना प्राधान्य देतो, टीमसोबत चर्चा करतो आणि कामाचे नियोजन योग्य sprints मध्ये करतो. आवश्यकता बदलल्यास प्राधान्यक्रम पुन्हा तपासतो.",
+      "tags": ["hr", "planning", "prioritization"]
+    },
+    {
+      "id": "hr-015",
+      "category": "Problem Solving",
+      "difficulty": "Intermediate",
+      "question": "How do you handle mistakes or bugs?",
+      "options": [],
+      "answer": "I identify and reproduce the issue, investigate the root cause, and implement an appropriate fix. I test the changes thoroughly, verify related functionality, and document important findings to prevent similar issues in the future.",
+      "answerMarathi": "मी समस्या ओळखून ती पुन्हा निर्माण करून पाहतो, तिचे मूळ कारण शोधतो आणि योग्य fix करतो. त्यानंतर बदलांची सखोल चाचणी घेतो, संबंधित functionality तपासतो आणि भविष्यात अशी समस्या पुन्हा होऊ नये म्हणून महत्त्वाच्या गोष्टींची नोंद करतो.",
+      "tags": ["hr", "bugs", "problem-solving"]
+    },
+    {
+      "id": "hr-016",
+      "category": "Career Motivation",
+      "difficulty": "Beginner",
+      "question": "Why did you choose Software or Frontend Development?",
+      "options": [],
+      "answer": "I enjoy building user-friendly interfaces and solving complex UI problems. Frontend Development combines creativity, problem-solving, and technical skills. I find it rewarding to create responsive applications that provide a smooth user experience.",
+      "answerMarathi": "मला user-friendly interfaces तयार करायला आणि complex UI problems सोडवायला आवडते. Frontend Development मध्ये सर्जनशीलता, समस्या सोडवण्याची क्षमता आणि तांत्रिक कौशल्ये यांचा संगम आहे. वापरकर्त्यांना उत्तम अनुभव देणारी responsive अॅप्लिकेशन्स तयार करण्यात मला समाधान मिळते.",
+      "tags": ["hr", "frontend", "motivation"]
+    },
+    {
+      "id": "hr-017",
+      "category": "Work Environment",
+      "difficulty": "Beginner",
+      "question": "Describe your ideal work environment.",
+      "options": [],
+      "answer": "I prefer a collaborative environment where team members share knowledge, communicate openly, and support each other. Clear goals, constructive feedback, and opportunities to learn help me deliver high-quality applications.",
+      "answerMarathi": "मला असे सहकार्यपूर्ण वातावरण आवडते जिथे टीममधील सदस्य ज्ञानाची देवाणघेवाण करतात, मोकळेपणाने संवाद साधतात आणि एकमेकांना मदत करतात. स्पष्ट उद्दिष्टे, सकारात्मक feedback आणि शिकण्याच्या संधींमुळे मला दर्जेदार अॅप्लिकेशन्स तयार करता येतात.",
+      "tags": ["hr", "work-environment", "teamwork"]
+    },
+    {
+      "id": "hr-018",
+      "category": "Feedback",
+      "difficulty": "Beginner",
+      "question": "How do you handle feedback or criticism?",
+      "options": [],
+      "answer": "I see constructive feedback as an opportunity to improve. I listen carefully, understand the suggestions, and implement relevant changes to enhance the quality of my work. I also use feedback to improve my skills and avoid repeating mistakes.",
+      "answerMarathi": "मी सकारात्मक feedback ला स्वतःमध्ये सुधारणा करण्याची संधी मानतो. मी सूचना काळजीपूर्वक ऐकतो, त्या समजून घेतो आणि कामाचा दर्जा सुधारण्यासाठी आवश्यक बदल करतो. माझी कौशल्ये वाढवण्यासाठी आणि चुका पुन्हा टाळण्यासाठीही feedback चा उपयोग करतो.",
+      "tags": ["hr", "feedback", "improvement"]
+    },
+    {
+      "id": "hr-019",
+      "category": "Career Goals",
+      "difficulty": "Intermediate",
+      "question": "Where do you see yourself in five years?",
+      "options": [],
+      "answer": "I see myself as a Lead Frontend Engineer or UI Architect, contributing to complex projects, making architectural decisions, and mentoring junior developers. I want to continue learning and help the organization achieve its technical and business goals.",
+      "answerMarathi": "पाच वर्षांनंतर मी स्वतःला Lead Frontend Engineer किंवा UI Architect म्हणून पाहतो. जटिल प्रोजेक्ट्समध्ये योगदान देणे, architectural decisions घेणे आणि junior developers ना मार्गदर्शन करणे हे माझे उद्दिष्ट आहे. सतत शिकत राहून कंपनीची तांत्रिक आणि व्यावसायिक उद्दिष्टे साध्य करण्यात मदत करायची आहे.",
+      "tags": ["hr", "five-year-goal", "leadership"]
+    },
+    {
+      "id": "hr-020",
+      "category": "Relocation",
+      "difficulty": "Beginner",
+      "question": "Are you willing to relocate?",
+      "options": [],
+      "answer": "Yes, I am open to relocation if the role and career opportunity are suitable. I would be happy to discuss the location, responsibilities, and overall expectations.",
+      "answerMarathi": "हो, नोकरीची भूमिका आणि करिअरची संधी योग्य असल्यास मी दुसऱ्या ठिकाणी स्थलांतर करण्यास तयार आहे. ठिकाण, जबाबदाऱ्या आणि इतर अपेक्षांबद्दल चर्चा करण्यास मला आनंद होईल.",
+      "tags": ["hr", "relocation"]
     }
   ]
 }
+

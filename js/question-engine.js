@@ -16,6 +16,7 @@ function normalizeQuestion(subjectId, rawQuestion, index) {
     question: rawQuestion.question || '',
     options,
     answer: rawQuestion.answer || '',
+    answerMarathi: rawQuestion.answerMarathi || '',
     explanation: rawQuestion.explanation || '',
     example: rawQuestion.example || '',
     tags: uniqueList(tags)

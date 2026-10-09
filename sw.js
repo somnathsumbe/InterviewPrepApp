@@ -1,5 +1,5 @@
 
-const APP_CACHE_NAME = 'interview-prep-v2';
+const APP_CACHE_NAME = 'interview-prep-v3';
 const APP_SHELL = [
   './', './index.html', './manifest.json', './css/app.css', './css/themes.css', './css/responsive.css',
   './js/app.js', './js/config.js', './js/storage.js', './js/state.js', './js/router.js', './js/ui.js',

@@ -39,10 +39,15 @@
               <button id="backToHome" type="button">← Technologies</button>
               <span id="techName" class="muted"></span>
             </div>
-            <div class="actions">
-              <button id="autoReadToggle" type="button" aria-pressed="false">🔊 Auto Read: OFF</button>
+            <div class="auto-read-controls" aria-label="Auto read controls">
+              <button id="autoReadToggle" type="button" aria-label="Auto Read Next Question" aria-pressed="false">🔊 Auto Read Next: OFF</button>
+              <button id="startAutoReadBtn" class="primary" type="button">Start Auto Read</button>
+              <button id="pauseAutoReadBtn" type="button" class="hidden" disabled>Pause</button>
+              <button id="resumeAutoReadBtn" type="button" class="hidden" disabled>Resume</button>
+              <button id="stopAutoReadBtn" type="button" class="hidden" disabled>Stop</button>
             </div>
           </div>
+          <p id="autoReadStatus" class="auto-read-status" role="status" aria-live="polite"></p>
 
           <div class="searchbox">
             <label for="searchInput" class="sr-only">Search questions</label>
@@ -110,7 +115,7 @@
           </div>
         </section>
 
-        <section id="summary-view" class="card summary hidden">
+        <section id="summary-view" class="view card summary hidden">
           <div class="big">🎉</div>
           <h2>Practice Completed</h2>
           <p id="summaryText" class="muted"></p>

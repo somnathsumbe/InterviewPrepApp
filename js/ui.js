@@ -113,7 +113,7 @@ export function renderPractice() {
   document.getElementById('statusBadge').textContent = `🔖 ${stats.bookmarkedCount} • ⚠️ ${stats.weakCount}`;
   const autoToggle = document.getElementById('autoReadToggle');
   if (autoToggle) {
-    autoToggle.textContent = `🔊 Auto Read: ${state.storage.autoRead ? 'ON' : 'OFF'}`;
+    autoToggle.textContent = `🔊 Auto Read Next: ${state.storage.autoRead ? 'ON' : 'OFF'}`;
     autoToggle.setAttribute('aria-pressed', String(state.storage.autoRead));
   }
 

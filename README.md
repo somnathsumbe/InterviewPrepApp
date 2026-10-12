@@ -8,7 +8,7 @@ A responsive, offline-capable interview preparation app built as a static PWA.
 - One-question-at-a-time practice flow
 - Responsive and accessible UI
 - Search, bookmark, weak-mode, and random practice
-- Text-to-speech with auto-read support
+- Text-to-speech with optional auto-read sequencing, pause, resume, and stop controls
 - LocalStorage persistence and resume flow
 - Installable PWA and offline caching
 

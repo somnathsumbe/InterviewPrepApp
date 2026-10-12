@@ -6,29 +6,154 @@ import { showHomeView, showPracticeView, showSummaryView } from './router.js';
 import { ensureSubjectData, getSubjectById, getCurrentQuestion, getVisibleQuestions, setCurrentQuestion, setCurrentSubjectAndResume, pickRandomQuestion } from './question-engine.js';
 import { performSearch } from './search.js';
 import { completeSubjectSession, getSubjectStats, isBookmarked, isWeak, toggleBookmark, toggleWeak } from './statistics.js';
-import { canUseSpeech, speakQuestion, stopSpeech } from './speech.js';
+import { canUseSpeech, speakQuestion, stopSpeech, pauseSpeech, resumeSpeech } from './speech.js';
 
 function normalizeId(value) {
   return String(value || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 }
 
-function setAutoRead(enabled) {
-  state.storage.autoRead = Boolean(enabled);
-  saveAppState();
-  const autoToggle = document.getElementById('autoReadToggle');
-  if (autoToggle) {
-    autoToggle.textContent = `🔊 Auto Read: ${state.storage.autoRead ? 'ON' : 'OFF'}`;
-    autoToggle.setAttribute('aria-pressed', String(state.storage.autoRead));
+let autoReadSession = null;
+let autoReadGeneration = 0;
+
+function updateAutoReadControls(message = '') {
+  const toggle = document.getElementById('autoReadToggle');
+  const start = document.getElementById('startAutoReadBtn');
+  const pause = document.getElementById('pauseAutoReadBtn');
+  const resume = document.getElementById('resumeAutoReadBtn');
+  const stop = document.getElementById('stopAutoReadBtn');
+  const status = document.getElementById('autoReadStatus');
+  const active = Boolean(autoReadSession);
+  const paused = active && autoReadSession.paused;
+
+  if (toggle) {
+    toggle.textContent = `🔊 Auto Read Next: ${state.storage.autoRead ? 'ON' : 'OFF'}`;
+    toggle.setAttribute('aria-pressed', String(state.storage.autoRead));
   }
-  if (state.storage.autoRead) {
-    const current = getCurrentQuestion();
-    if (current) speakQuestion(current);
-  } else {
-    stopSpeech();
+  if (start) start.classList.toggle('hidden', active);
+  if (pause) {
+    pause.classList.toggle('hidden', !active || paused);
+    pause.disabled = !active || paused;
+  }
+  if (resume) {
+    resume.classList.toggle('hidden', !active || !paused);
+    resume.disabled = !active || !paused;
+  }
+  if (stop) {
+    stop.classList.toggle('hidden', !active);
+    stop.disabled = !active;
+  }
+  if (status) {
+    status.textContent = message || (paused
+      ? 'Auto Read is paused.'
+      : active ? 'Auto Read is reading this question sequence.' : '');
   }
 }
 
+function stopAutoRead({ cancelSpeech = true, message = '' } = {}) {
+  autoReadGeneration += 1;
+  autoReadSession = null;
+  if (cancelSpeech) stopSpeech();
+  updateAutoReadControls(message);
+}
+
+function advanceAutoRead(questionId, generation) {
+  if (!autoReadSession
+    || generation !== autoReadGeneration
+    || state.currentSubject !== autoReadSession.subjectId
+    || state.currentFilter !== autoReadSession.filter
+    || state.currentQuestionId !== questionId) {
+    stopAutoRead({ message: 'Auto Read stopped because the question sequence changed.' });
+    return;
+  }
+
+  const visible = getVisibleQuestions(autoReadSession.subjectId, autoReadSession.filter);
+  const currentPosition = autoReadSession.sequence.indexOf(questionId);
+  const nextQuestion = autoReadSession.sequence
+    .slice(currentPosition + 1)
+    .map((id) => visible.find((entry) => entry.id === id))
+    .find(Boolean);
+
+  if (!nextQuestion) {
+    stopAutoRead({ cancelSpeech: false });
+    finishPractice();
+    return;
+  }
+
+  setCurrentQuestion(autoReadSession.subjectId, nextQuestion.id, autoReadSession.filter);
+  renderPractice();
+  readAutoQuestion(nextQuestion, generation);
+}
+
+function readAutoQuestion(question, generation) {
+  if (!autoReadSession || generation !== autoReadGeneration) return;
+  const started = speakQuestion(question, {
+    onEnd: () => {
+      if (!autoReadSession || generation !== autoReadGeneration) return;
+      if (autoReadSession.paused) {
+        autoReadSession.pendingQuestionId = question.id;
+        return;
+      }
+      advanceAutoRead(question.id, generation);
+    },
+    onError: (message) => {
+      if (generation !== autoReadGeneration) return;
+      stopAutoRead({ cancelSpeech: false, message: `Auto Read stopped: ${message}` });
+      showError(`Text-to-Speech could not continue: ${message}`);
+    }
+  });
+
+  if (!started && autoReadSession && generation === autoReadGeneration) {
+    stopAutoRead({ message: 'Auto Read could not start. Check that speech is available in this browser.' });
+  }
+}
+
+function startAutoRead() {
+  const current = getCurrentQuestion();
+  if (!canUseSpeech()) {
+    stopAutoRead({ message: 'Text-to-Speech is not supported in this browser.' });
+    showError('Text-to-Speech is not supported in this browser.');
+    return;
+  }
+  if (!current || !state.currentSubject) {
+    stopAutoRead({ message: 'Open a question before starting Auto Read.' });
+    return;
+  }
+
+  stopAutoRead();
+  state.storage.autoRead = true;
+  saveAppState();
+  if (state.currentQuestionId !== current.id) {
+    setCurrentQuestion(state.currentSubject, current.id, state.currentFilter);
+    renderPractice();
+  }
+  const visible = getVisibleQuestions(state.currentSubject, state.currentFilter);
+  const index = visible.findIndex((question) => question.id === current.id);
+  if (index < 0) {
+    updateAutoReadControls('Auto Read could not find the current question in this sequence.');
+    return;
+  }
+
+  const generation = autoReadGeneration;
+  autoReadSession = {
+    subjectId: state.currentSubject,
+    filter: state.currentFilter,
+    sequence: visible.map((question) => question.id),
+    paused: false
+  };
+  hideError();
+  updateAutoReadControls();
+  readAutoQuestion(current, generation);
+}
+
+function setAutoRead(enabled) {
+  state.storage.autoRead = Boolean(enabled);
+  saveAppState();
+  if (!state.storage.autoRead && autoReadSession) stopAutoRead({ message: 'Auto Read is off.' });
+  else updateAutoReadControls(state.storage.autoRead ? 'Auto Read is on. Start reading to continue through the sequence.' : 'Auto Read is off.');
+}
+
 async function openSubject(subjectId, resume = true) {
+  stopAutoRead();
   try {
     showLoading('Loading questions...');
     const normalized = normalizeId(subjectId);
@@ -48,10 +173,7 @@ async function openSubject(subjectId, resume = true) {
     hideError();
     showPracticeView();
     renderPractice();
-    if (state.storage.autoRead) {
-      const current = getCurrentQuestion();
-      if (current) speakQuestion(current);
-    }
+    updateAutoReadControls();
   } catch (error) {
     showError(error.message || 'Unable to load questions. Please try again.');
   } finally {
@@ -60,6 +182,7 @@ async function openSubject(subjectId, resume = true) {
 }
 
 function finishPractice() {
+  stopAutoRead();
   stopSpeech();
   if (state.currentSubject) {
     completeSubjectSession(state.currentSubject);
@@ -70,6 +193,7 @@ function finishPractice() {
 
 function handleNext() {
   if (!state.currentSubject) return;
+  const wasAutoReading = Boolean(autoReadSession);
   const questions = getVisibleQuestions(state.currentSubject, state.currentFilter);
   if (!questions.length) return;
   const currentIndex = questions.findIndex((question) => question.id === state.currentQuestionId);
@@ -79,25 +203,31 @@ function handleNext() {
     return;
   }
   const nextQuestion = questions[nextIndex];
+  if (wasAutoReading) stopAutoRead();
+  else stopSpeech();
   setCurrentQuestion(state.currentSubject, nextQuestion.id, state.currentFilter);
   renderPractice();
-  if (state.storage.autoRead) speakQuestion(nextQuestion);
+  if (wasAutoReading) startAutoRead();
 }
 
 function handlePrevious() {
   if (!state.currentSubject) return;
+  const wasAutoReading = Boolean(autoReadSession);
   const questions = getVisibleQuestions(state.currentSubject, state.currentFilter);
   if (!questions.length) return;
   const currentIndex = questions.findIndex((question) => question.id === state.currentQuestionId);
   if (currentIndex <= 0) return;
   const prevQuestion = questions[currentIndex - 1];
+  if (wasAutoReading) stopAutoRead();
+  else stopSpeech();
   setCurrentQuestion(state.currentSubject, prevQuestion.id, state.currentFilter);
   renderPractice();
-  if (state.storage.autoRead) speakQuestion(prevQuestion);
+  if (wasAutoReading) startAutoRead();
 }
 
 function applyFilter(filter) {
   if (!state.currentSubject) return;
+  stopAutoRead();
   state.currentFilter = filter;
   const questions = getVisibleQuestions(state.currentSubject, filter);
   if (!questions.length) {
@@ -109,11 +239,11 @@ function applyFilter(filter) {
   setCurrentQuestion(state.currentSubject, firstQuestion.id, filter);
   hideError();
   renderPractice();
-  if (state.storage.autoRead) speakQuestion(firstQuestion);
+  updateAutoReadControls();
 }
 
 document.addEventListener('click', async (event) => {
-  const subjectButton = event.target.closest('[data-subject]');
+  const subjectButton = event.target.closest('.tech-card[data-subject]');
   if (subjectButton && subjectButton.dataset.subject) {
     await openSubject(subjectButton.dataset.subject, true);
     return;
@@ -121,13 +251,14 @@ document.addEventListener('click', async (event) => {
 
   const resultButton = event.target.closest('.search-item');
   if (resultButton) {
+    stopAutoRead();
     const subjectId = resultButton.dataset.subject || state.currentSubject;
     const questionId = resultButton.dataset.questionId;
     if (subjectId && questionId) {
       setCurrentQuestion(subjectId, questionId, state.currentFilter);
       document.getElementById('searchResults').classList.add('hidden');
       renderPractice();
-      if (state.storage.autoRead) speakQuestion(getCurrentQuestion());
+      updateAutoReadControls();
     }
     return;
   }
@@ -155,7 +286,7 @@ document.addEventListener('click', async (event) => {
   }
 
   if (event.target.closest('#backToHome') || event.target.closest('#backToHomeBtn')) {
-    stopSpeech();
+    stopAutoRead();
     state.currentSubject = null;
     state.currentQuestionId = null;
     showHomeView();
@@ -172,25 +303,31 @@ document.addEventListener('click', async (event) => {
 
   if (event.target.closest('#bookmarkBtn')) {
     if (!state.currentSubject || !state.currentQuestionId) return;
+    stopAutoRead();
     toggleBookmark(state.currentSubject, state.currentQuestionId);
     renderPractice();
+    updateAutoReadControls();
     return;
   }
 
   if (event.target.closest('#weakQuestionBtn')) {
     if (!state.currentSubject || !state.currentQuestionId) return;
+    stopAutoRead();
     toggleWeak(state.currentSubject, state.currentQuestionId);
     renderPractice();
+    updateAutoReadControls();
     return;
   }
 
   if (event.target.closest('#allQuestionsBtn')) {
     if (!state.currentSubject) return;
+    stopAutoRead();
     state.currentFilter = FILTERS.ALL;
     const firstQuestion = getVisibleQuestions(state.currentSubject, FILTERS.ALL)[0];
     if (firstQuestion) {
       setCurrentQuestion(state.currentSubject, firstQuestion.id, FILTERS.ALL);
       renderPractice();
+      updateAutoReadControls();
     }
     return;
   }
@@ -207,11 +344,12 @@ document.addEventListener('click', async (event) => {
 
   if (event.target.closest('#randomBtn')) {
     if (!state.currentSubject) return;
+    stopAutoRead();
     const question = pickRandomQuestion(state.currentSubject, state.currentFilter);
     if (question) {
       setCurrentQuestion(state.currentSubject, question.id, state.currentFilter);
       renderPractice();
-      if (state.storage.autoRead) speakQuestion(question);
+      updateAutoReadControls();
     }
     return;
   }
@@ -224,12 +362,49 @@ document.addEventListener('click', async (event) => {
       return;
     }
     hideError();
-    speakQuestion(current);
+    if (state.storage.autoRead) {
+      startAutoRead();
+    } else {
+      stopAutoRead();
+      speakQuestion(current, {
+        onError: (message) => showError(`Text-to-Speech could not read this question: ${message}`)
+      });
+    }
     return;
   }
 
-  if (event.target.closest('#stopBtn')) {
-    stopSpeech();
+  if (event.target.closest('#startAutoReadBtn')) {
+    startAutoRead();
+    return;
+  }
+
+  if (event.target.closest('#pauseAutoReadBtn')) {
+    if (autoReadSession && pauseSpeech()) {
+      autoReadSession.paused = true;
+      updateAutoReadControls();
+    } else if (autoReadSession) {
+      stopAutoRead({ message: 'Speech could not be paused in this browser.' });
+      showError('Speech could not be paused in this browser.');
+    }
+    return;
+  }
+
+  if (event.target.closest('#resumeAutoReadBtn')) {
+    if (autoReadSession && resumeSpeech()) {
+      const pendingQuestionId = autoReadSession.pendingQuestionId;
+      autoReadSession.paused = false;
+      autoReadSession.pendingQuestionId = null;
+      updateAutoReadControls();
+      if (pendingQuestionId) advanceAutoRead(pendingQuestionId, autoReadGeneration);
+    } else if (autoReadSession) {
+      stopAutoRead({ message: 'Speech could not be resumed in this browser.' });
+      showError('Speech could not be resumed in this browser.');
+    }
+    return;
+  }
+
+  if (event.target.closest('#stopAutoReadBtn') || event.target.closest('#stopBtn')) {
+    stopAutoRead({ message: 'Auto Read stopped.' });
     return;
   }
 
@@ -250,6 +425,7 @@ document.addEventListener('click', async (event) => {
 
 document.addEventListener('input', (event) => {
   if (event.target.id !== 'searchInput' || !state.currentSubject) return;
+  stopAutoRead();
   const term = event.target.value.trim();
   if (!term) {
     document.getElementById('searchResults').classList.add('hidden');
@@ -266,10 +442,13 @@ document.addEventListener('keydown', (event) => {
   }
 });
 
+window.addEventListener('pagehide', () => stopAutoRead());
+
 async function bootstrap() {
   initializeTheme();
   const backgroundButton = document.getElementById('themeButton');
   if (backgroundButton) backgroundButton.textContent = state.storage.theme === 'dark' ? '☀️' : '🌙';
+  updateAutoReadControls();
 
   try {
     showLoading('Loading questions...');

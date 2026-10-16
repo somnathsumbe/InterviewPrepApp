@@ -1,125 +1,20 @@
-      "difficulty": "Intermediate",
-      "question": "What is the difference between the hidden attribute and display: none?",
-      "options": [],
-      "answer": "The hidden HTML attribute indicates that an element is not currently relevant and normally prevents it from being rendered. CSS display: none also removes the element from layout. CSS can override the hidden attribute's default display behavior.",
-      "explanation": "मराठी: दोन्हीमुळे element साधारणपणे दिसत नाही आणि layout मध्ये जागा घेत नाही. hidden हा HTML attribute आहे; display:none ही CSS property आहे. hidden element ला focus करता येते असे गृहित धरू नका.",
-      "example": "<p hidden>This content is hidden</p>\\n<p style=\"display: none;\">This content is also hidden</p>",
-      "tags": [
-        "hidden",
-        "display none",
-        "css",
-        "html"
-      ]
-    },
+{
+  "subject": "HTML",
+  "version": 1,
+  "description": "HTML interview preparation questions",
+  "questions": [
     {
-      "id": "html-css-014",
-      "category": "CSS Positioning",
+      "id": "html-001",
+      "category": "Basics",
       "difficulty": "Intermediate",
-      "question": "What is the difference between absolute, relative, fixed, and sticky positioning?",
+      "question": "What is HTML?",
       "options": [],
-      "answer": "relative offsets an element from its normal position; absolute positions it relative to its containing block; fixed positions it relative to the viewport in typical cases; sticky behaves like relative until a scroll threshold is reached, then sticks within its scrolling container.",
-      "explanation": "मराठी: relative = स्वतःच्या मूळ जागेपासून; absolute = containing block नुसार; fixed = viewport वर स्थिर; sticky = scroll करताना ठरावीक ठिकाणी चिकटतो. लक्षात ठेवा: Own, Parent, Screen, Scroll.",
-      "example": ".relative { position: relative; top: 10px; }\\n.parent { position: relative; }\\n.absolute { position: absolute; top: 10px; }\\n.fixed { position: fixed; top: 0; }\\n.sticky { position: sticky; top: 0; }",
+      "answer": "HTML stands for HyperText Markup Language. It is used to structure content on web pages.",
+      "explanation": "HTML defines the structure and meaning of page content using elements and attributes.",
+      "example": "<h1>Hello World</h1>",
       "tags": [
-        "css positioning",
-        "absolute",
-        "relative",
-        "fixed",
-        "sticky"
-      ]
-    },
-    {
-      "id": "html-css-015",
-      "category": "Performance",
-      "difficulty": "Intermediate",
-      "question": "How do you optimize HTML page performance?",
-      "options": [],
-      "answer": "Optimize performance by minimizing and compressing assets, using responsive images, lazy-loading offscreen images, reducing unnecessary DOM work, caching static assets, and loading JavaScript appropriately.",
-      "explanation": "मराठी: File size कमी करा, images योग्य आकारात द्या, गरज नसलेले DOM elements टाळा आणि JavaScript चे loading योग्य ठेवा. लक्षात ठेवा: Less bytes, less work, smart loading.",
-      "example": "<img src=\"photo.webp\" alt=\"Product\" loading=\"lazy\" width=\"400\" height=\"300\">\\n<script defer src=\"app.js\"></script>",
-      "tags": [
-        "performance",
-        "lazy loading",
-        "compression",
-        "optimization"
-      ]
-    },
-    {
-      "id": "html-css-016",
-      "category": "JavaScript Loading",
-      "difficulty": "Intermediate",
-      "question": "What is the difference between async and defer in script tags?",
-      "options": [],
-      "answer": "Both download external scripts without blocking HTML parsing during the download. async executes as soon as the script is ready and does not guarantee order. defer executes after HTML parsing and preserves document order among deferred classic scripts.",
-      "explanation": "मराठी: async = download झाल्यावर लगेच execute; order ची हमी नाही. defer = HTML parsing पूर्ण झाल्यावर execute आणि defer scripts चा क्रम राखतो. लक्षात ठेवा: async = ASAP; defer = after parsing, in order.",
-      "example": "<script async src=\"analytics.js\"></script>\\n<script defer src=\"app.js\"></script>",
-      "tags": [
-        "async",
-        "defer",
-        "script",
-        "performance"
-      ]
-    },
-    {
-      "id": "html-css-017",
-      "category": "HTML",
-      "difficulty": "Intermediate",
-      "question": "Does HTML5 make a page automatically responsive?",
-      "options": [],
-      "answer": "No. HTML5 provides features that support modern web development, but responsive layouts must be implemented with viewport settings, CSS media queries, flexible layouts, and responsive assets.",
-      "explanation": "मराठी: फक्त HTML5 वापरल्याने page responsive होत नाही. CSS Grid, Flexbox, media queries आणि योग्य viewport meta tag वापरावे लागतात. लक्षात ठेवा: HTML structure + CSS responsiveness.",
-      "example": "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\\n<style>\\n.container { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }\\n</style>",
-      "tags": [
-        "responsive design",
-        "viewport",
-        "css grid"
-      ]
-    },
-    {
-      "id": "html-css-018",
-      "category": "HTML",
-      "difficulty": "Intermediate",
-      "question": "How do semantic HTML elements improve accessibility and SEO?",
-      "options": [],
-      "answer": "Semantic elements communicate page structure and content roles, helping browsers, assistive technologies, developers, and search engines interpret the page.",
-      "explanation": "मराठी: योग्य heading hierarchy, main, nav, article आणि button सारखे meaningful elements वापरल्याने screen-reader navigation आणि content understanding सुधारते. SEO ranking आपोआप वाढेल याची हमी नसते.",
-      "example": "<main>\\n  <article>\\n    <h1>Interview Preparation</h1>\\n    <p>Learn HTML and CSS concepts.</p>\\n  </article>\\n</main>",
-      "tags": [
-        "accessibility",
-        "seo",
-        "semantic html"
-      ]
-    },
-    {
-      "id": "html-css-019",
-      "category": "HTML",
-      "difficulty": "Intermediate",
-      "question": "What is the difference between localStorage, sessionStorage, and cookies?",
-      "options": [],
-      "answer": "localStorage persists until cleared, sessionStorage lasts for the page session in a tab, and cookies can be sent to the server with matching HTTP requests depending on their settings.",
-      "explanation": "मराठी: localStorage = manually clear करेपर्यंत; sessionStorage = tab/page session पुरते; cookies = expiry आणि security settings असू शकतात व server requests सोबत पाठवले जाऊ शकतात. लक्षात ठेवा: Persistent, session, request data.",
-      "example": "localStorage.setItem('theme', 'dark');\\nsessionStorage.setItem('activeTab', 'profile');\\ndocument.cookie = 'language=en; path=/; SameSite=Lax';",
-      "tags": [
-        "localStorage",
-        "sessionStorage",
-        "cookies",
-        "storage"
-      ]
-    },
-    {
-      "id": "html-css-020",
-      "category": "HTML",
-      "difficulty": "Basic",
-      "question": "What is the difference between block and inline elements?",
-      "options": [],
-      "answer": "Block elements typically start on a new line and occupy the available inline space. Inline elements flow within text and generally occupy only the space their content needs.",
-      "explanation": "मराठी: block element साधारणपणे नवीन line पासून सुरू होतो; inline element text च्या flow मध्ये राहतो. CSS display property मुळे हे वर्तन बदलू शकते.",
-      "example": "<div>Block element</div><p>Another block</p><span>Inline</span> <a href=\"#\">Inline link</a>",
-      "tags": [
-        "block",
-        "inline",
         "html",
-        "css"
+        "basics"
       ]
     }
   ]

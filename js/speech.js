@@ -9,6 +9,16 @@ export function canUseSpeech() {
 
 let activeUtterance = null;
 
+function getEnglishVoice() {
+  const voices = typeof window.speechSynthesis.getVoices === 'function'
+    ? window.speechSynthesis.getVoices()
+    : [];
+  return voices.find((voice) => /^en-in$/i.test(voice.lang))
+    || voices.find((voice) => /^en-us$/i.test(voice.lang))
+    || voices.find((voice) => /^en(?:-|$)/i.test(voice.lang))
+    || null;
+}
+
 export function stopSpeech() {
   if (canUseSpeech()) {
     if (activeUtterance) {
@@ -40,32 +50,22 @@ export function resumeSpeech() {
   }
 }
 
-export function speakQuestion(question, { onEnd = () => {}, onError = () => {} } = {}) {
-  if (!question || !canUseSpeech()) {
-    return false;
-  }
-
-  const parts = [];
-  if (question.question) parts.push(`Question: ${question.question}`);
-
-  if (Array.isArray(question.options) && question.options.length) {
-    parts.push(`Options: ${question.options.map((option, index) => `${String.fromCharCode(65 + index)}. ${option}`).join(' ')}`);
-  }
-
-  if (question.answer) parts.push(`Answer: ${question.answer}`);
-
-  if (question.answerMarathi) parts.push(`Marathi answer: ${question.answerMarathi}`);
-  if (question.explanation) parts.push(`Explanation: ${question.explanation}`);
-  if (question.example) parts.push(`Example: ${question.example}`);
-
-  if (!parts.length) {
-    onError('There is no question or answer content available to read.');
-    return false;
-  }
-
+export function speakEnglishText(englishText, { onEnd = () => {}, onError = () => {} } = {}) {
   stopSpeech();
+  if (typeof englishText !== 'string' || !englishText.trim()) {
+    onError('There is no English text available to read.');
+    return false;
+  }
+  if (!canUseSpeech()) {
+    onError('Text-to-Speech is not supported in this browser.');
+    return false;
+  }
+
   try {
-    const utterance = new window.SpeechSynthesisUtterance(parts.join('. '));
+    const utterance = new window.SpeechSynthesisUtterance(englishText.trim());
+    const voice = getEnglishVoice();
+    utterance.lang = voice ? voice.lang : 'en-US';
+    if (voice) utterance.voice = voice;
     utterance.rate = 0.9;
     utterance.onend = () => {
       if (activeUtterance !== utterance) return;
@@ -82,7 +82,7 @@ export function speakQuestion(question, { onEnd = () => {}, onError = () => {} }
     return true;
   } catch (error) {
     activeUtterance = null;
-    onError(error.message || 'Speech could not be started.');
+    onError(error?.message || 'Speech could not be started.');
     return false;
   }
 }

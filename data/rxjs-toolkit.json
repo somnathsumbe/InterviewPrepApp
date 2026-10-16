@@ -1,26 +1,283 @@
+
 {
   "subject": "RxJS Toolkit",
   "version": 1,
-  "description": "RxJS Toolkit interview preparation questions",
+  "description": "RxJS Operators interview preparation with simple English answers, Marathi explanations and practical examples",
   "questions": [
     {
       "id": "rxjs-toolkit-001",
       "category": "Reactive",
-      "difficulty": "Advanced",
+      "difficulty": "Basic",
       "question": "What is an RxJS Observable?",
-      "options": [
-        "Stream of values over time",
-        "CSS selector",
-        "Database table",
-        "HTML tag"
-      ],
-      "answer": "An Observable represents a stream of values over time and allows operators to compose asynchronous or event-based logic.",
-      "explanation": "It is widely used in Angular for HTTP, events and reactive state flows.",
-      "example": "source$.pipe(map(x=>x*2), filter(x=>x>10));",
-      "tags": [
-        "rxjs toolkit",
-        "reactive"
-      ]
+      "options": [],
+      "answer": "An Observable is a stream of values over time. It can emit values, complete, or return an error.",
+      "explanation": "मराठी: Observable म्हणजे वेळेनुसार data देणारा stream. उदाहरणार्थ API response, button click किंवा timer.",
+      "example": "of(10, 20, 30).subscribe(value => console.log(value));",
+      "tags": ["rxjs", "observable", "reactive"]
+    },
+    {
+      "id": "rxjs-toolkit-002",
+      "category": "Transformation",
+      "difficulty": "Basic",
+      "question": "What is the map() operator?",
+      "options": [],
+      "answer": "map() transforms each emitted value into a new value.",
+      "explanation": "मराठी: map() म्हणजे प्रत्येक value बदलून नवीन value तयार करणे. लक्षात ठेवा: Transform data.",
+      "example": "of(2, 4, 6).pipe(map(value => value * 2)).subscribe(console.log);",
+      "tags": ["map", "transform", "rxjs"]
+    },
+    {
+      "id": "rxjs-toolkit-003",
+      "category": "Transformation",
+      "difficulty": "Advanced",
+      "question": "What is the switchMap() operator?",
+      "options": [],
+      "answer": "switchMap() switches to a new inner Observable and unsubscribes from the previous inner Observable.",
+      "explanation": "मराठी: नवीन value आल्यावर मागील inner subscription बंद करून नवीन सुरू करतो. लक्षात ठेवा: Latest request.",
+      "example": "this.searchControl.valueChanges.pipe(debounceTime(300), distinctUntilChanged(), switchMap(query => this.api.search(query))).subscribe(console.log);",
+      "tags": ["switchMap", "search", "http"]
+    },
+    {
+      "id": "rxjs-toolkit-004",
+      "category": "Transformation",
+      "difficulty": "Advanced",
+      "question": "What is the mergeMap() operator?",
+      "options": [],
+      "answer": "mergeMap() subscribes to multiple inner Observables concurrently and merges their emitted values.",
+      "explanation": "मराठी: अनेक inner requests एकाच वेळी चालू शकतात. Results वेगवेगळ्या क्रमाने येऊ शकतात. लक्षात ठेवा: Parallel work.",
+      "example": "from([1, 2, 3]).pipe(mergeMap(id => this.api.getUser(id))).subscribe(console.log);",
+      "tags": ["mergeMap", "parallel", "concurrency"]
+    },
+    {
+      "id": "rxjs-toolkit-005",
+      "category": "Transformation",
+      "difficulty": "Advanced",
+      "question": "What is the concatMap() operator?",
+      "options": [],
+      "answer": "concatMap() processes inner Observables sequentially, waiting for each one to complete before starting the next.",
+      "explanation": "मराठी: एक काम पूर्ण झाल्यावरच पुढचे काम सुरू होते. लक्षात ठेवा: Queue or sequence.",
+      "example": "from([1, 2, 3]).pipe(concatMap(id => this.api.saveUser(id))).subscribe(console.log);",
+      "tags": ["concatMap", "sequential", "queue"]
+    },
+    {
+      "id": "rxjs-toolkit-006",
+      "category": "Transformation",
+      "difficulty": "Advanced",
+      "question": "What is the exhaustMap() operator?",
+      "options": [],
+      "answer": "exhaustMap() ignores new source values while the current inner Observable is active.",
+      "explanation": "मराठी: एक request सुरू असताना आलेल्या नवीन requests दुर्लक्षित करतो. लक्षात ठेवा: Ignore repeated clicks.",
+      "example": "fromEvent(button, 'click').pipe(exhaustMap(() => this.api.submitForm())).subscribe(console.log);",
+      "tags": ["exhaustMap", "form", "duplicate requests"]
+    },
+    {
+      "id": "rxjs-toolkit-007",
+      "category": "Filtering",
+      "difficulty": "Basic",
+      "question": "What is the filter() operator?",
+      "options": [],
+      "answer": "filter() emits only values that satisfy a given condition.",
+      "explanation": "मराठी: दिलेली condition पूर्ण करणारा data फक्त पुढे पाठवतो. लक्षात ठेवा: Select required data.",
+      "example": "of(10, 15, 20, 25).pipe(filter(value => value > 15)).subscribe(console.log);",
+      "tags": ["filter", "condition", "rxjs"]
+    },
+    {
+      "id": "rxjs-toolkit-008",
+      "category": "Filtering",
+      "difficulty": "Basic",
+      "question": "What is the tap() operator?",
+      "options": [],
+      "answer": "tap() performs side effects without changing the emitted values.",
+      "explanation": "मराठी: Data न बदलता logging किंवा debugging सारखी कामे करतो. लक्षात ठेवा: Observe without transform.",
+      "example": "this.api.getUsers().pipe(tap(users => console.log(users))).subscribe();",
+      "tags": ["tap", "debugging", "side effects"]
+    },
+    {
+      "id": "rxjs-toolkit-009",
+      "category": "Timing",
+      "difficulty": "Intermediate",
+      "question": "What is the debounceTime() operator?",
+      "options": [],
+      "answer": "debounceTime() emits a value only after a specified period passes without another source emission.",
+      "explanation": "मराठी: User काही वेळ type करणे थांबवल्यावरच value पुढे पाठवतो. लक्षात ठेवा: Wait until typing stops.",
+      "example": "this.searchControl.valueChanges.pipe(debounceTime(300)).subscribe(console.log);",
+      "tags": ["debounceTime", "search", "performance"]
+    },
+    {
+      "id": "rxjs-toolkit-010",
+      "category": "Timing",
+      "difficulty": "Intermediate",
+      "question": "What is the throttleTime() operator?",
+      "options": [],
+      "answer": "throttleTime() limits emissions by allowing a value and then suppressing further values during a time window.",
+      "explanation": "मराठी: ठरावीक वेळेत वारंवार येणाऱ्या events कमी करतो. लक्षात ठेवा: Limit event frequency.",
+      "example": "fromEvent(window, 'scroll').pipe(throttleTime(300)).subscribe(console.log);",
+      "tags": ["throttleTime", "scroll", "performance"]
+    },
+    {
+      "id": "rxjs-toolkit-011",
+      "category": "Filtering",
+      "difficulty": "Intermediate",
+      "question": "What is the distinctUntilChanged() operator?",
+      "options": [],
+      "answer": "distinctUntilChanged() emits a value only when it differs from the previously emitted value.",
+      "explanation": "मराठी: मागील value सारखीच value पुन्हा आली तर ती पुढे पाठवत नाही. लक्षात ठेवा: Skip consecutive duplicates.",
+      "example": "of(1, 1, 2, 2, 3).pipe(distinctUntilChanged()).subscribe(console.log);",
+      "tags": ["distinctUntilChanged", "duplicate values"]
+    },
+    {
+      "id": "rxjs-toolkit-012",
+      "category": "Filtering",
+      "difficulty": "Intermediate",
+      "question": "What is the take() operator?",
+      "options": [],
+      "answer": "take(n) emits the first n values and then completes.",
+      "explanation": "मराठी: फक्त पहिल्या ठरावीक values घेतो आणि नंतर stream complete करतो. लक्षात ठेवा: Take limited values.",
+      "example": "interval(1000).pipe(take(3)).subscribe(console.log);",
+      "tags": ["take", "limit", "complete"]
+    },
+    {
+      "id": "rxjs-toolkit-013",
+      "category": "Combination",
+      "difficulty": "Intermediate",
+      "question": "What is the forkJoin() operator?",
+      "options": [],
+      "answer": "forkJoin() waits for all input Observables to complete and emits their last values together once.",
+      "explanation": "मराठी: सर्व finite API calls पूर्ण झाल्यावर एकत्र final result मिळतो. लक्षात ठेवा: Wait for all.",
+      "example": "forkJoin({user: this.api.getUser(), posts: this.api.getPosts()}).subscribe(result => console.log(result));",
+      "tags": ["forkJoin", "api", "parallel"]
+    },
+    {
+      "id": "rxjs-toolkit-014",
+      "category": "Combination",
+      "difficulty": "Intermediate",
+      "question": "What is the combineLatest() operator?",
+      "options": [],
+      "answer": "combineLatest() emits the latest values from all input Observables whenever any input emits, after each has emitted at least once.",
+      "explanation": "मराठी: सर्व Observables मधून एकदा तरी value आल्यावर, कोणत्याही stream ची नवीन value आली की latest values एकत्र मिळतात. लक्षात ठेवा: Latest values together.",
+      "example": "combineLatest([this.user$, this.settings$]).subscribe(([user, settings]) => console.log(user, settings));",
+      "tags": ["combineLatest", "state", "combination"]
+    },
+    {
+      "id": "rxjs-toolkit-015",
+      "category": "Combination",
+      "difficulty": "Intermediate",
+      "question": "What is the withLatestFrom() operator?",
+      "options": [],
+      "answer": "withLatestFrom() emits when the source Observable emits, combining its value with the latest values from other Observables.",
+      "explanation": "मराठी: मुख्य source emit झाल्यावरच result मिळतो; इतर streams च्या latest values सोबत मिळतात. लक्षात ठेवा: Source triggers.",
+      "example": "this.saveClick$.pipe(withLatestFrom(this.formValue$)).subscribe(([click, form]) => console.log(form));",
+      "tags": ["withLatestFrom", "form", "combination"]
+    },
+    {
+      "id": "rxjs-toolkit-016",
+      "category": "Combination",
+      "difficulty": "Intermediate",
+      "question": "What is the zip() operator?",
+      "options": [],
+      "answer": "zip() combines values from input Observables by matching them in emission order.",
+      "explanation": "मराठी: प्रत्येक stream मधील क्रमाने आलेल्या values ची जोडी बनवतो. लक्षात ठेवा: Match by position.",
+      "example": "zip(of('A', 'B'), of(1, 2)).subscribe(console.log);",
+      "tags": ["zip", "combination", "sequence"]
+    },
+    {
+      "id": "rxjs-toolkit-017",
+      "category": "Error Handling",
+      "difficulty": "Intermediate",
+      "question": "What is the catchError() operator?",
+      "options": [],
+      "answer": "catchError() handles an Observable error by switching to another Observable or rethrowing the error.",
+      "explanation": "मराठी: Error आल्यावर fallback data देऊ शकतो किंवा error पुढे पाठवू शकतो. लक्षात ठेवा: Handle errors.",
+      "example": "this.api.getUsers().pipe(catchError(error => of([]))).subscribe(console.log);",
+      "tags": ["catchError", "error", "fallback"]
+    },
+    {
+      "id": "rxjs-toolkit-018",
+      "category": "Error Handling",
+      "difficulty": "Intermediate",
+      "question": "What is the retry() operator?",
+      "options": [],
+      "answer": "retry(n) resubscribes to a failing Observable up to n retry attempts before forwarding the error.",
+      "explanation": "मराठी: Request fail झाल्यास ठरावीक वेळा पुन्हा प्रयत्न करतो. लक्षात ठेवा: Try again.",
+      "example": "this.api.getUsers().pipe(retry(2)).subscribe(console.log);",
+      "tags": ["retry", "http", "error handling"]
+    },
+    {
+      "id": "rxjs-toolkit-019",
+      "category": "Utility",
+      "difficulty": "Intermediate",
+      "question": "What is the finalize() operator?",
+      "options": [],
+      "answer": "finalize() runs a callback when the Observable terminates through completion, error, or unsubscription.",
+      "explanation": "मराठी: Stream complete झाला, error आला किंवा unsubscribe झाले तरी cleanup callback चालतो. लक्षात ठेवा: Cleanup.",
+      "example": "this.loading = true; this.api.getUsers().pipe(finalize(() => this.loading = false)).subscribe();",
+      "tags": ["finalize", "cleanup", "loading"]
+    },
+    {
+      "id": "rxjs-toolkit-020",
+      "category": "Utility",
+      "difficulty": "Intermediate",
+      "question": "What is the takeUntil() operator?",
+      "options": [],
+      "answer": "takeUntil() completes the source subscription when a notifier Observable emits.",
+      "explanation": "मराठी: Notifier emit झाल्यावर source subscription बंद होते. लक्षात ठेवा: Stop when notified.",
+      "example": "this.api.getUsers().pipe(takeUntil(this.destroy$)).subscribe(console.log);",
+      "tags": ["takeUntil", "unsubscribe", "angular"]
+    },
+    {
+      "id": "rxjs-toolkit-021",
+      "category": "Combination",
+      "difficulty": "Intermediate",
+      "question": "What is the startWith() operator?",
+      "options": [],
+      "answer": "startWith() emits the specified initial values before the source values.",
+      "explanation": "मराठी: मूळ stream सुरू होण्यापूर्वी initial value पाठवतो. लक्षात ठेवा: Initial value first.",
+      "example": "this.searchControl.valueChanges.pipe(startWith('')).subscribe(console.log);",
+      "tags": ["startWith", "initial value", "forms"]
+    },
+    {
+      "id": "rxjs-toolkit-022",
+      "category": "Utility",
+      "difficulty": "Intermediate",
+      "question": "What is the shareReplay() operator?",
+      "options": [],
+      "answer": "shareReplay() shares a source subscription and replays buffered emissions to later subscribers.",
+      "explanation": "मराठी: एकाच stream चे results अनेक subscribers मध्ये share करून आधीच्या values पुन्हा देऊ शकतो. लक्षात ठेवा: Share and replay.",
+      "example": "users$ = this.http.get('/api/users').pipe(shareReplay({bufferSize: 1, refCount: true}));",
+      "tags": ["shareReplay", "cache", "multicasting"]
+    },
+    {
+      "id": "rxjs-toolkit-023",
+      "category": "Reactive",
+      "difficulty": "Basic",
+      "question": "What is the of() creation function?",
+      "options": [],
+      "answer": "of() creates an Observable that emits the supplied arguments and then completes.",
+      "explanation": "मराठी: दिलेल्या values एकामागोमाग emit करून stream complete करतो. लक्षात ठेवा: Values to Observable.",
+      "example": "of(10, 20, 30).subscribe(console.log);",
+      "tags": ["of", "creation", "observable"]
+    },
+    {
+      "id": "rxjs-toolkit-024",
+      "category": "Reactive",
+      "difficulty": "Intermediate",
+      "question": "What is the from() creation function?",
+      "options": [],
+      "answer": "from() converts supported inputs such as arrays, iterables, Promises, and other supported interop sources into an Observable.",
+      "explanation": "मराठी: Array किंवा Promise सारख्या supported source मधून Observable तयार करतो. लक्षात ठेवा: Convert source to Observable.",
+      "example": "from([10, 20, 30]).subscribe(console.log);",
+      "tags": ["from", "promise", "array"]
+    },
+    {
+      "id": "rxjs-toolkit-025",
+      "category": "Reactive",
+      "difficulty": "Intermediate",
+      "question": "What is the Subject in RxJS?",
+      "options": [],
+      "answer": "A Subject is both an Observable and an Observer. It allows values to be pushed to multiple subscribers.",
+      "explanation": "मराठी: Subject मधून आपण next() वापरून value पाठवू शकतो आणि अनेक subscribers ती value ऐकू शकतात. लक्षात ठेवा: Send and subscribe.",
+      "example": "const subject = new Subject<number>(); subject.subscribe(console.log); subject.next(10);",
+      "tags": ["Subject", "multicasting", "reactive"]
     }
   ]
 }

@@ -73,7 +73,7 @@
 
           <article class="card question" aria-live="polite">
             <div class="toprow">
-              <div class="muted">INTERVIEW QUESTION</div>
+              <div class="muted">ENGLISH QUESTION</div>
               <div class="actions">
                 <button id="bookmarkBtn" type="button">🔖 Bookmark</button>
                 <button id="weakQuestionBtn" type="button" aria-pressed="false">⚠️ Mark Weak</button>
@@ -86,14 +86,15 @@
             </div>
 
             <h2 id="questionText"></h2>
+            <button id="questionReadBtn" class="speech-control" type="button">🔊 Read English Question</button>
             <div id="optionsContainer" class="options"></div>
 
             <div id="answerBlock" class="answer">
-              <strong>✅ Answer</strong>
+              <strong>✅ ENGLISH ANSWER</strong>
               <div id="answerText"></div>
-              <div id="marathiAnswerWrap" class="hidden" style="margin-top: 12px;">
-                <strong>🇮🇳 मराठी उत्तर</strong>
-                <div id="answerTextMarathi" style="margin-top: 8px;"></div>
+              <div id="marathiAnswerWrap" class="marathi-answer" lang="mr">
+                <strong>मराठीत समजून घ्या</strong>
+                <div id="answerTextMarathi"></div>
               </div>
               <span id="explanationText" class="explanation"></span>
             </div>
@@ -106,7 +107,7 @@
 
           <div class="nav">
             <button id="prevBtn" type="button">← Previous</button>
-            <button id="readBtn" class="primary" type="button">🔊 Read</button>
+            <button id="readBtn" class="primary" type="button">🔊 Read English Answer</button>
             <button id="nextBtn" class="primary" type="button">Next →</button>
           </div>
 

@@ -1,5 +1,5 @@
 
-const APP_CACHE_NAME = 'interview-prep-v4';
+const APP_CACHE_NAME = 'interview-prep-v8';
 const APP_SHELL = [
   './', './index.html', './manifest.json', './css/app.css', './css/themes.css', './css/responsive.css',
   './js/app.js', './js/config.js', './js/storage.js', './js/state.js', './js/router.js', './js/ui.js',
@@ -28,6 +28,28 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
+
+  if (url.pathname.includes('/data/') && url.pathname.endsWith('.json')) {
+    event.respondWith(
+      fetch(new Request(request, { cache: 'no-store' }))
+        .then((response) => {
+          if (response.ok) {
+            const responseCopy = response.clone();
+            caches.open(APP_CACHE_NAME).then((cache) => cache.put(request, responseCopy));
+          }
+          return response;
+        })
+        .catch(async () => {
+          const cached = await caches.match(request);
+          if (cached) return cached;
+          return new Response('Question data is unavailable offline.', {
+            status: 503,
+            headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+          });
+        })
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(request).then((cached) => {

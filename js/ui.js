@@ -49,7 +49,7 @@ export function renderHome() {
 
 function renderOptions(question) {
   if (!Array.isArray(question.options) || !question.options.length) {
-    return '<div class="muted">No multiple-choice options for this question.</div>';
+    return '';
   }
   return question.options.map((option, index) => {
     const label = String.fromCharCode(65 + index);
@@ -81,14 +81,16 @@ export function renderPractice() {
   document.getElementById('answerText').textContent = question.answer || '';
   const marathiWrap = document.getElementById('marathiAnswerWrap');
   if (marathiWrap) {
-    marathiWrap.classList.toggle('hidden', !question.answerMarathi);
+    marathiWrap.classList.remove('hidden');
   }
   const marathiAnswerText = document.getElementById('answerTextMarathi');
   if (marathiAnswerText) {
-    marathiAnswerText.textContent = question.answerMarathi || '';
+    marathiAnswerText.textContent = question.answerMarathi || 'या प्रश्नासाठी मराठी भाषांतर उपलब्ध नाही.';
   }
   document.getElementById('explanationText').textContent = question.explanation;
-  document.getElementById('optionsContainer').innerHTML = renderOptions(question);
+  const optionsContainer = document.getElementById('optionsContainer');
+  optionsContainer.innerHTML = renderOptions(question);
+  optionsContainer.classList.toggle('hidden', !question.options.length);
   document.getElementById('exampleWrap').classList.toggle('hidden', !question.example);
   document.getElementById('exampleText').textContent = question.example || '';
 

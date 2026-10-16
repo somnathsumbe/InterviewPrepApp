@@ -6,7 +6,7 @@ import { showHomeView, showPracticeView, showSummaryView } from './router.js';
 import { ensureSubjectData, getSubjectById, getCurrentQuestion, getVisibleQuestions, setCurrentQuestion, setCurrentSubjectAndResume, pickRandomQuestion } from './question-engine.js';
 import { performSearch } from './search.js';
 import { completeSubjectSession, getSubjectStats, isBookmarked, isWeak, toggleBookmark, toggleWeak } from './statistics.js';
-import { canUseSpeech, speakQuestion, stopSpeech, pauseSpeech, resumeSpeech } from './speech.js';
+import { canUseSpeech, speakEnglishText, stopSpeech, pauseSpeech, resumeSpeech } from './speech.js';
 
 function normalizeId(value) {
   return String(value || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
@@ -86,7 +86,30 @@ function advanceAutoRead(questionId, generation) {
 
 function readAutoQuestion(question, generation) {
   if (!autoReadSession || generation !== autoReadGeneration) return;
-  const started = speakQuestion(question, {
+  const started = speakEnglishText(question.question, {
+    onEnd: () => {
+      if (!autoReadSession || generation !== autoReadGeneration) return;
+      if (autoReadSession.paused) {
+        autoReadSession.pendingAnswerId = question.id;
+        return;
+      }
+      readAutoAnswer(question, generation);
+    },
+    onError: (message) => {
+      if (generation !== autoReadGeneration) return;
+      stopAutoRead({ cancelSpeech: false, message: `Auto Read stopped: ${message}` });
+      showError(`Text-to-Speech could not continue: ${message}`);
+    }
+  });
+
+  if (!started && autoReadSession && generation === autoReadGeneration) {
+    stopAutoRead({ message: 'Auto Read could not start. Check that speech is available in this browser.' });
+  }
+}
+
+function readAutoAnswer(question, generation) {
+  if (!autoReadSession || generation !== autoReadGeneration) return;
+  const started = speakEnglishText(question.answer, {
     onEnd: () => {
       if (!autoReadSession || generation !== autoReadGeneration) return;
       if (autoReadSession.paused) {
@@ -362,14 +385,21 @@ document.addEventListener('click', async (event) => {
       return;
     }
     hideError();
-    if (state.storage.autoRead) {
-      startAutoRead();
-    } else {
-      stopAutoRead();
-      speakQuestion(current, {
-        onError: (message) => showError(`Text-to-Speech could not read this question: ${message}`)
-      });
-    }
+    stopAutoRead();
+    speakEnglishText(current.answer, {
+      onError: (message) => showError(`Text-to-Speech could not read the English answer: ${message}`)
+    });
+    return;
+  }
+
+  if (event.target.closest('#questionReadBtn')) {
+    const current = getCurrentQuestion();
+    if (!current) return;
+    stopAutoRead();
+    hideError();
+    speakEnglishText(current.question, {
+      onError: (message) => showError(`Text-to-Speech could not read the English question: ${message}`)
+    });
     return;
   }
 
@@ -392,10 +422,17 @@ document.addEventListener('click', async (event) => {
   if (event.target.closest('#resumeAutoReadBtn')) {
     if (autoReadSession && resumeSpeech()) {
       const pendingQuestionId = autoReadSession.pendingQuestionId;
+      const pendingAnswerId = autoReadSession.pendingAnswerId;
       autoReadSession.paused = false;
       autoReadSession.pendingQuestionId = null;
+      autoReadSession.pendingAnswerId = null;
       updateAutoReadControls();
       if (pendingQuestionId) advanceAutoRead(pendingQuestionId, autoReadGeneration);
+      else if (pendingAnswerId) {
+        const question = getVisibleQuestions(autoReadSession.subjectId, autoReadSession.filter)
+          .find((entry) => entry.id === pendingAnswerId);
+        if (question) readAutoAnswer(question, autoReadGeneration);
+      }
     } else if (autoReadSession) {
       stopAutoRead({ message: 'Speech could not be resumed in this browser.' });
       showError('Speech could not be resumed in this browser.');

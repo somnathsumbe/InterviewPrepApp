@@ -9,6 +9,7 @@ A responsive, offline-capable interview preparation app built as a static PWA.
 - Responsive and accessible UI
 - Search, bookmark, weak-mode, and random practice
 - Text-to-speech with optional auto-read sequencing, pause, resume, and stop controls
+- English-only question and answer speech, with Marathi translations displayed for reading
 - LocalStorage persistence and resume flow
 - Installable PWA and offline caching
 

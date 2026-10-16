@@ -102,10 +102,13 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 .options { display: grid; gap: 10px; }
 .option { width: 100%; text-align: left; }
 .option.selected { border-color: var(--accent); background: var(--surface-strong); }
+.speech-control { margin: -12px 0 16px; }
 .answer {
   margin-top: 22px; padding: 17px; background: var(--surface-strong); border-left: 4px solid var(--accent); border-radius: 10px; line-height: 1.65;
 }
 .answer strong { display: block; margin-bottom: 6px; }
+.marathi-answer { margin-top: 14px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 9px; }
+.marathi-answer strong { margin-bottom: 6px; }
 .explanation { display: block; margin-top: 10px; color: var(--muted); }
 .code {
   margin-top: 16px; background: var(--code-bg); color: var(--code-text); padding: 16px; border-radius: 10px; white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; overflow-x: auto;

@@ -35,8 +35,11 @@ function stopPlayback(message = '') {
 function updateVoiceStatus() {
   const status = document.getElementById('voiceStatus');
   if (!status) return;
+  const statusMessage = document.getElementById('voiceStatusMessage') || status;
+  const windowsSettingsLink = document.getElementById('windowsLanguageSettingsLink');
   if (!canUseSpeech()) {
-    status.textContent = 'Text-to-Speech is not supported in this browser.';
+    statusMessage.textContent = 'Text-to-Speech is not supported in this browser.';
+    windowsSettingsLink?.classList.add('hidden');
     return;
   }
 
@@ -59,8 +62,12 @@ function updateVoiceStatus() {
     : language === 'mr-IN'
       ? 'Marathi speech is unavailable. Install or enable a Marathi speech voice in your operating system or browser; English will not be used for Marathi.'
       : 'No English speech voice is available. Install or enable a voice in your operating system or browser.';
-  status.textContent = `${availableStatus} ${selectedStatus}`;
-  if (state.storage.englishPracticeMode) status.textContent = `English Practice Mode forces English speech. ${status.textContent}`;
+  statusMessage.textContent = `${availableStatus} ${selectedStatus}`;
+  if (state.storage.englishPracticeMode) {
+    statusMessage.textContent = `English Practice Mode forces English speech. ${statusMessage.textContent}`;
+  }
+  const isWindows = /Windows/i.test(navigator.userAgent);
+  windowsSettingsLink?.classList.toggle('hidden', !isWindows || Boolean(marathiVoice));
 }
 
 function setSpeechPanelExpanded(expanded) {
@@ -86,7 +93,11 @@ function openPracticeAt(question) {
   renderPractice();
 }
 
-function startSequence(questions, { label = 'Reading questions', contentMode = 'all' } = {}) {
+function startSequence(questions, {
+  label = 'Reading questions',
+  contentMode = 'all',
+  language = state.storage.englishPracticeMode ? 'en-IN' : state.storage.speechLanguage
+} = {}) {
   if (!state.currentSubject) return;
   stopPlayback();
   if (!canUseSpeech()) {
@@ -106,12 +117,13 @@ function startSequence(questions, { label = 'Reading questions', contentMode = '
   playbackPaused = false;
   updatePlaybackControls(`${label}...`);
   const started = startSpeechSequence(sequence, {
-    language: state.storage.englishPracticeMode ? 'en-IN' : state.storage.speechLanguage,
+    language,
     rate: state.storage.speechRate,
     onVoicePending: (language) => {
       speechWaitingForVoice = true;
       const status = document.getElementById('voiceStatus');
-      if (status) status.textContent = `Waiting for an available ${language === 'mr-IN' ? 'Marathi' : 'Indian English'} voice...`;
+      const statusMessage = document.getElementById('voiceStatusMessage') || status;
+      if (statusMessage) statusMessage.textContent = `Waiting for an available ${language === 'mr-IN' ? 'Marathi' : 'Indian English'} voice...`;
       updatePlaybackControls();
     },
     onItemStart: (question) => {
@@ -367,6 +379,28 @@ document.addEventListener('click', async (event) => {
   if (event.target.closest('#readBtn')) {
     const current = getCurrentQuestion();
     if (current) startSequence([current], { label: 'Reading answer', contentMode: 'answer' });
+    return;
+  }
+  if (event.target.closest('#readEnglishAnswerBtn')) {
+    const current = getCurrentQuestion();
+    if (current) {
+      startSequence([current], {
+        label: 'Reading English answer',
+        contentMode: 'answer',
+        language: 'en-IN'
+      });
+    }
+    return;
+  }
+  if (event.target.closest('#readMarathiAnswerBtn')) {
+    const current = getCurrentQuestion();
+    if (current) {
+      startSequence([current], {
+        label: 'वाचन सुरू आहे: मराठी उत्तर',
+        contentMode: 'answer',
+        language: 'mr-IN'
+      });
+    }
     return;
   }
   if (event.target.closest('#readCurrentBtn')) return readCurrent();

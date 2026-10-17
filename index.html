@@ -71,7 +71,10 @@
                   English Practice Mode
                 </label>
               </div>
-              <p id="voiceStatus" class="auto-read-status" role="status" aria-live="polite"></p>
+              <p id="voiceStatus" class="auto-read-status" role="status" aria-live="polite">
+                <span id="voiceStatusMessage"></span>
+                <a id="windowsLanguageSettingsLink" class="voice-settings-link hidden" href="ms-settings:regionlanguage">Open Windows language settings</a>
+              </p>
               <div class="speech-actions">
                 <button id="autoReadToggle" type="button" aria-pressed="false">Auto Read Next: OFF</button>
                 <button id="readCurrentBtn" class="primary" type="button">▶ Play / Read Current Question</button>
@@ -133,12 +136,20 @@
             <div id="optionsContainer" class="options"></div>
 
             <div id="answerBlock" class="answer">
-              <strong>✅ ENGLISH ANSWER</strong>
-              <div id="answerText"></div>
-              <div id="marathiAnswerWrap" class="marathi-answer" lang="mr">
-                <strong>मराठी उत्तर</strong>
-                <div id="answerTextMarathi"></div>
-              </div>
+              <section class="answer-card answer-card-english" lang="en">
+                <div class="answer-heading">
+                  <strong>✅ ENGLISH ANSWER</strong>
+                  <button id="readEnglishAnswerBtn" class="answer-read-button" type="button" aria-label="Read English answer aloud using an Indian English voice">🔊 Read Aloud · English (India)</button>
+                </div>
+                <div id="answerText" class="answer-copy"></div>
+              </section>
+              <section id="marathiAnswerWrap" class="answer-card answer-card-marathi" lang="mr">
+                <div class="answer-heading">
+                  <strong>🇮🇳 मराठी उत्तर</strong>
+                  <button id="readMarathiAnswerBtn" class="answer-read-button" type="button" aria-label="Read Marathi answer aloud using an Indian Marathi voice">🔊 मोठ्याने वाचा · मराठी (भारत)</button>
+                </div>
+                <div id="answerTextMarathi" class="answer-copy"></div>
+              </section>
             </div>
 
             <div id="explanationWrap" class="explanation-block hidden">

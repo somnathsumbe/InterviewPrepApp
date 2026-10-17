@@ -155,7 +155,7 @@ function speakNext(token) {
       playback = null;
       voiceLoadTimer = null;
       current.onError?.(current.language === 'mr-IN'
-        ? 'No Marathi (mr-IN) speech voice is available. Install or enable a Marathi speech voice in your operating system or browser, then try again.'
+        ? 'No Marathi speech voice is available. On Windows, open Language settings, add Marathi, and check whether a Marathi speech voice can be installed. Restart the browser after installation. If Windows does not offer a Marathi speech voice, this device needs a speech engine that supports Marathi; an English voice will not be used as a substitute.'
         : 'No English speech voice is available. Install or enable an English speech voice in your operating system or browser, then try again.');
     }, 3000);
     return;

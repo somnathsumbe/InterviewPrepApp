@@ -89,9 +89,7 @@ export function renderPractice() {
   document.getElementById('questionText').textContent = question.question;
   document.getElementById('answerText').textContent = question.answer || '';
   const marathiWrap = document.getElementById('marathiAnswerWrap');
-  if (marathiWrap) {
-    marathiWrap.classList.remove('hidden');
-  }
+  if (marathiWrap) marathiWrap.classList.remove('hidden');
   const marathiAnswerText = document.getElementById('answerTextMarathi');
   if (marathiAnswerText) {
     marathiAnswerText.textContent = question.answerMarathi || 'या प्रश्नासाठी मराठी भाषांतर उपलब्ध नाही.';
@@ -136,7 +134,6 @@ export function renderPractice() {
   const practiceMode = document.getElementById('englishPracticeMode');
   if (practiceMode) {
     practiceMode.checked = Boolean(state.storage.englishPracticeMode);
-    marathiWrap?.classList.toggle('hidden', state.storage.englishPracticeMode);
   }
   const language = document.getElementById('speechLanguage');
   if (language) {

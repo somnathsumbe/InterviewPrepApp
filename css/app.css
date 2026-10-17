@@ -109,13 +109,19 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 .option { width: 100%; text-align: left; }
 .option.selected { border-color: var(--accent); background: var(--surface-strong); }
 .speech-control { margin: -12px 0 16px; }
-.answer {
-  margin-top: 22px; padding: 17px; background: var(--surface-strong); border-left: 4px solid var(--accent); border-radius: 10px; line-height: 1.65;
+.answer { display: grid; gap: 14px; margin-top: 22px; }
+.answer-card {
+  min-width: 0; padding: 18px; background: var(--surface); border: 1px solid var(--border);
+  border-left: 4px solid var(--accent); border-radius: 12px; box-shadow: 0 4px 16px var(--shadow);
 }
-.answer strong { display: block; margin-bottom: 6px; }
-.answer #answerText, .marathi-answer > div, .explanation-block > div { white-space: pre-wrap; }
-.marathi-answer { margin-top: 14px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 9px; }
-.marathi-answer strong { margin-bottom: 6px; }
+.answer-card-marathi { border-left-color: #16856b; }
+.answer-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.answer-heading strong { font-size: 17px; }
+.answer-read-button { padding: 8px 11px; color: var(--accent); font-size: 13px; font-weight: 650; }
+.answer-card-marathi .answer-read-button { color: #16856b; }
+.answer-copy, .explanation-block > div { white-space: pre-wrap; line-height: 1.8; overflow-wrap: anywhere; }
+.answer-card-english .answer-copy { font-size: 16px; }
+.answer-card-marathi .answer-copy { font-family: "Noto Sans Devanagari", "Nirmala UI", Mangal, system-ui, sans-serif; font-size: 17px; }
 .explanation-block { margin-top: 12px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 9px; color: var(--muted); line-height: 1.7; }
 .explanation-block strong { display: block; margin-bottom: 5px; color: var(--text); }
 .code {
@@ -126,6 +132,7 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 .readbar { justify-content: center; margin-top: 8px; }
 .auto-read-controls { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
 .auto-read-status { min-height: 1.25em; margin: 5px 0 10px; color: var(--muted); font-size: 13px; }
+.voice-settings-link { display: inline-block; margin: 5px 8px 0 0; color: var(--accent); }
 .speech-panel { margin: 12px 0; padding: 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
 .speech-panel-toggle { display: flex; width: 100%; align-items: center; justify-content: space-between; font-weight: 700; text-align: left; }
 .speech-panel-toggle span { font-size: 18px; line-height: 1; }
@@ -139,8 +146,6 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 .speech-actions { margin-bottom: 10px; }
 .speech-actions button, .range-controls button { flex: 1 1 auto; }
 .range-controls input { width: 115px; }
-.answer .marathi-answer { line-height: 1.8; }
-.marathi-answer [lang="mr"], [lang="mr"] { font-family: "Noto Sans Devanagari", "Nirmala UI", Mangal, system-ui, sans-serif; }
 .summary { text-align: center; padding: 55px 25px; margin-top: 40px; }
 .big { font-size: 55px; }
 .footer { text-align: center; margin: 25px; color: var(--muted); font-size: 12px; }
@@ -153,6 +158,9 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 @media (max-width: 760px) {
   .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .question { padding: 20px; min-height: 0; }
+  .answer-card { padding: 15px; }
+  .answer-heading { align-items: flex-start; }
+  .answer-read-button { max-width: 100%; }
   .toprow, .toolbar, .nav { flex-direction: column; align-items: stretch; }
   .auto-read-controls { justify-content: flex-start; }
   .speech-settings, .speech-actions, .range-controls { align-items: stretch; }

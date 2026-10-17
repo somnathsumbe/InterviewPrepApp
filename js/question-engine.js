@@ -7,18 +7,20 @@ import { isBookmarked, isWeak, markQuestionVisited } from './statistics.js';
 const subjectCache = new Map();
 
 function normalizeQuestion(subjectId, rawQuestion, index) {
-  const options = Array.isArray(rawQuestion.options) ? rawQuestion.options : [];
-  const tags = Array.isArray(rawQuestion.tags) ? rawQuestion.tags : [];
+  const source = rawQuestion && typeof rawQuestion === 'object' ? rawQuestion : {};
+  const options = Array.isArray(source.options) ? source.options : [];
+  const tags = Array.isArray(source.tags) ? source.tags : [];
   return {
-    id: rawQuestion.id || `${subjectId}-${String(index + 1).padStart(3, '0')}`,
-    category: rawQuestion.category || 'General',
-    difficulty: rawQuestion.difficulty || 'Beginner',
-    question: rawQuestion.question || '',
+    id: source.id || `${subjectId}-${String(index + 1).padStart(3, '0')}`,
+    category: source.category || 'General',
+    difficulty: source.difficulty || 'Beginner',
+    question: source.question || '',
+    questionMarathi: source.questionMarathi || '',
     options,
-    answer: rawQuestion.answer || '',
-    answerMarathi: rawQuestion.answerMarathi || '',
-    explanation: rawQuestion.explanation || '',
-    example: rawQuestion.example || '',
+    answer: source.answer || '',
+    answerMarathi: source.answerMarathi || '',
+    explanation: source.explanation || '',
+    example: source.example || '',
     tags: uniqueList(tags)
   };
 }
@@ -52,12 +54,14 @@ export async function ensureSubjectData(subjectId) {
   if (!response.ok) throw new Error('Unable to load questions. Please try again.');
 
   const payload = await response.json();
-  const normalizedQuestions = Array.isArray(payload.questions)
-    ? payload.questions.map((question, index) => normalizeQuestion(resolvedId, question, index))
-    : [];
+  const sourceQuestions = Array.isArray(payload) ? payload : payload?.questions;
+  if (!Array.isArray(sourceQuestions)) {
+    throw new Error(`The question bank for ${subject.name} has an invalid format.`);
+  }
+  const normalizedQuestions = sourceQuestions.map((question, index) => normalizeQuestion(resolvedId, question, index));
 
   const data = {
-    ...payload,
+    ...(Array.isArray(payload) ? {} : payload),
     id: resolvedId,
     name: payload.subject || subject.name || String(subjectId),
     questions: normalizedQuestions

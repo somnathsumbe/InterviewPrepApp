@@ -1,475 +1,433 @@
-
 import { FILTERS } from './config.js';
 import { state, initializeTheme, saveAppState } from './state.js';
 import { renderHome, renderPractice, renderSummary, renderSearchResults, showLoading, hideLoading, showError, hideError } from './ui.js';
 import { showHomeView, showPracticeView, showSummaryView } from './router.js';
 import { ensureSubjectData, getSubjectById, getCurrentQuestion, getVisibleQuestions, setCurrentQuestion, setCurrentSubjectAndResume, pickRandomQuestion } from './question-engine.js';
 import { performSearch } from './search.js';
-import { completeSubjectSession, getSubjectStats, isBookmarked, isWeak, toggleBookmark, toggleWeak } from './statistics.js';
-import { canUseSpeech, speakEnglishText, stopSpeech, pauseSpeech, resumeSpeech } from './speech.js';
+import { completeSubjectSession, getSubjectStats, toggleBookmark, toggleWeak } from './statistics.js';
+import { canUseSpeech, getSpeechVoices, getVoicesForLanguage, subscribeToVoices, startSpeechSequence, stopSpeech, pauseSpeech, resumeSpeech, moveSpeech, isSpeechPlaying } from './speech.js';
 
-function normalizeId(value) {
-  return String(value || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+let playbackSession = null;
+let playbackPaused = false;
+let unsubscribeVoices = null;
+
+function updatePlaybackControls(message = '') {
+  const active = isSpeechPlaying();
+  const pause = document.getElementById('pauseSpeechBtn');
+  const resume = document.getElementById('resumeSpeechBtn');
+  const stop = document.getElementById('stopSpeechBtn');
+  if (pause) pause.disabled = !active || playbackPaused;
+  if (resume) resume.disabled = !active || !playbackPaused;
+  if (stop) stop.disabled = !active;
+  const status = document.getElementById('speechStatus');
+  if (status && message) status.textContent = message;
 }
 
-let autoReadSession = null;
-let autoReadGeneration = 0;
-
-function updateAutoReadControls(message = '') {
-  const toggle = document.getElementById('autoReadToggle');
-  const start = document.getElementById('startAutoReadBtn');
-  const pause = document.getElementById('pauseAutoReadBtn');
-  const resume = document.getElementById('resumeAutoReadBtn');
-  const stop = document.getElementById('stopAutoReadBtn');
-  const status = document.getElementById('autoReadStatus');
-  const active = Boolean(autoReadSession);
-  const paused = active && autoReadSession.paused;
-
-  if (toggle) {
-    toggle.textContent = `🔊 Auto Read Next: ${state.storage.autoRead ? 'ON' : 'OFF'}`;
-    toggle.setAttribute('aria-pressed', String(state.storage.autoRead));
-  }
-  if (start) start.classList.toggle('hidden', active);
-  if (pause) {
-    pause.classList.toggle('hidden', !active || paused);
-    pause.disabled = !active || paused;
-  }
-  if (resume) {
-    resume.classList.toggle('hidden', !active || !paused);
-    resume.disabled = !active || !paused;
-  }
-  if (stop) {
-    stop.classList.toggle('hidden', !active);
-    stop.disabled = !active;
-  }
-  if (status) {
-    status.textContent = message || (paused
-      ? 'Auto Read is paused.'
-      : active ? 'Auto Read is reading this question sequence.' : '');
-  }
+function stopPlayback(message = '') {
+  playbackSession = null;
+  playbackPaused = false;
+  stopSpeech();
+  updatePlaybackControls(message);
 }
 
-function stopAutoRead({ cancelSpeech = true, message = '' } = {}) {
-  autoReadGeneration += 1;
-  autoReadSession = null;
-  if (cancelSpeech) stopSpeech();
-  updateAutoReadControls(message);
+function updateVoiceStatus() {
+  const status = document.getElementById('voiceStatus');
+  if (!status) return;
+
+  const language = state.storage.englishPracticeMode ? 'en-IN' : state.storage.speechLanguage;
+  const voices = getVoicesForLanguage(language);
+  const preferred = language === 'mr-IN'
+    ? voices.find((voice) => /^mr-in$/i.test(voice.lang)) || voices[0]
+    : voices.find((voice) => /^en-in$/i.test(voice.lang));
+
+  if (!getSpeechVoices().length) {
+    status.textContent = 'This browser has not provided any speech voices yet.';
+  } else if (language === 'mr-IN' && !preferred) {
+    status.textContent = 'No Marathi speech voice is available. Marathi playback is unavailable on this device.';
+  } else if (language === 'en-IN' && !preferred) {
+    status.textContent = voices.length
+      ? `No Indian English voice is available. English playback will use ${voices[0].name} (${voices[0].lang}).`
+      : 'No English speech voice is available on this device.';
+  } else {
+    status.textContent = `${preferred.name} (${preferred.lang}) selected automatically.`;
+  }
+  if (state.storage.englishPracticeMode) status.textContent = `English Practice Mode forces English speech. ${status.textContent}`;
 }
 
-function advanceAutoRead(questionId, generation) {
-  if (!autoReadSession
-    || generation !== autoReadGeneration
-    || state.currentSubject !== autoReadSession.subjectId
-    || state.currentFilter !== autoReadSession.filter
-    || state.currentQuestionId !== questionId) {
-    stopAutoRead({ message: 'Auto Read stopped because the question sequence changed.' });
-    return;
-  }
+function setSpeechPanelExpanded(expanded) {
+  const toggle = document.getElementById('speechPanelToggle');
+  const content = document.getElementById('speechPanelContent');
+  const chevron = document.getElementById('speechPanelChevron');
+  if (!toggle || !content || !chevron) return;
+  toggle.setAttribute('aria-expanded', String(expanded));
+  content.classList.toggle('hidden', !expanded);
+  chevron.textContent = expanded ? '⌃' : '⌄';
+}
 
-  const visible = getVisibleQuestions(autoReadSession.subjectId, autoReadSession.filter);
-  const currentPosition = autoReadSession.sequence.indexOf(questionId);
-  const nextQuestion = autoReadSession.sequence
-    .slice(currentPosition + 1)
-    .map((id) => visible.find((entry) => entry.id === id))
-    .find(Boolean);
+function updateAutoReadToggle() {
+  const button = document.getElementById('autoReadToggle');
+  if (!button) return;
+  button.textContent = `Auto Read Next: ${state.storage.autoRead ? 'ON' : 'OFF'}`;
+  button.setAttribute('aria-pressed', String(state.storage.autoRead));
+}
 
-  if (!nextQuestion) {
-    stopAutoRead({ cancelSpeech: false });
-    finishPractice();
-    return;
-  }
-
-  setCurrentQuestion(autoReadSession.subjectId, nextQuestion.id, autoReadSession.filter);
+function openPracticeAt(question) {
+  if (!question || !state.currentSubject) return;
+  setCurrentQuestion(state.currentSubject, question.id, state.currentFilter);
   renderPractice();
-  readAutoQuestion(nextQuestion, generation);
 }
 
-function readAutoQuestion(question, generation) {
-  if (!autoReadSession || generation !== autoReadGeneration) return;
-  const started = speakEnglishText(question.question, {
-    onEnd: () => {
-      if (!autoReadSession || generation !== autoReadGeneration) return;
-      if (autoReadSession.paused) {
-        autoReadSession.pendingAnswerId = question.id;
-        return;
-      }
-      readAutoAnswer(question, generation);
-    },
-    onError: (message) => {
-      if (generation !== autoReadGeneration) return;
-      stopAutoRead({ cancelSpeech: false, message: `Auto Read stopped: ${message}` });
-      showError(`Text-to-Speech could not continue: ${message}`);
-    }
-  });
-
-  if (!started && autoReadSession && generation === autoReadGeneration) {
-    stopAutoRead({ message: 'Auto Read could not start. Check that speech is available in this browser.' });
-  }
-}
-
-function readAutoAnswer(question, generation) {
-  if (!autoReadSession || generation !== autoReadGeneration) return;
-  const started = speakEnglishText(question.answer, {
-    onEnd: () => {
-      if (!autoReadSession || generation !== autoReadGeneration) return;
-      if (autoReadSession.paused) {
-        autoReadSession.pendingQuestionId = question.id;
-        return;
-      }
-      advanceAutoRead(question.id, generation);
-    },
-    onError: (message) => {
-      if (generation !== autoReadGeneration) return;
-      stopAutoRead({ cancelSpeech: false, message: `Auto Read stopped: ${message}` });
-      showError(`Text-to-Speech could not continue: ${message}`);
-    }
-  });
-
-  if (!started && autoReadSession && generation === autoReadGeneration) {
-    stopAutoRead({ message: 'Auto Read could not start. Check that speech is available in this browser.' });
-  }
-}
-
-function startAutoRead() {
-  const current = getCurrentQuestion();
+function startSequence(questions, { label = 'Reading questions', contentMode = 'all' } = {}) {
+  if (!state.currentSubject) return;
+  stopPlayback();
   if (!canUseSpeech()) {
-    stopAutoRead({ message: 'Text-to-Speech is not supported in this browser.' });
     showError('Text-to-Speech is not supported in this browser.');
     return;
   }
-  if (!current || !state.currentSubject) {
-    stopAutoRead({ message: 'Open a question before starting Auto Read.' });
+  if (!questions.length) {
+    showError('There are no questions in the selected sequence.');
     return;
   }
 
-  stopAutoRead();
-  state.storage.autoRead = true;
-  saveAppState();
-  if (state.currentQuestionId !== current.id) {
-    setCurrentQuestion(state.currentSubject, current.id, state.currentFilter);
-    renderPractice();
-  }
-  const visible = getVisibleQuestions(state.currentSubject, state.currentFilter);
-  const index = visible.findIndex((question) => question.id === current.id);
-  if (index < 0) {
-    updateAutoReadControls('Auto Read could not find the current question in this sequence.');
-    return;
-  }
-
-  const generation = autoReadGeneration;
-  autoReadSession = {
-    subjectId: state.currentSubject,
-    filter: state.currentFilter,
-    sequence: visible.map((question) => question.id),
-    paused: false
-  };
   hideError();
-  updateAutoReadControls();
-  readAutoQuestion(current, generation);
+  const subjectId = state.currentSubject;
+  const sequence = questions.map((question) => ({ ...question, speechMode: contentMode }));
+  const session = { subjectId, questions: sequence };
+  playbackSession = session;
+  playbackPaused = false;
+  updatePlaybackControls(`${label}...`);
+  const started = startSpeechSequence(sequence, {
+    language: state.storage.englishPracticeMode ? 'en-IN' : state.storage.speechLanguage,
+    rate: state.storage.speechRate,
+    onItemStart: (question) => {
+      if (playbackSession !== session || state.currentSubject !== subjectId) return;
+      state.currentFilter = FILTERS.ALL;
+      openPracticeAt(question);
+      const all = getVisibleQuestions(subjectId, FILTERS.ALL);
+      const index = all.findIndex((entry) => entry.id === question.id);
+      const status = document.getElementById('speechStatus');
+      if (status) status.textContent = `Reading question ${index + 1} of ${all.length}`;
+      updatePlaybackControls();
+    },
+    onEnd: () => {
+      if (playbackSession !== session) return;
+      playbackSession = null;
+      playbackPaused = false;
+      updatePlaybackControls('Reading complete.');
+    },
+    onError: (message) => {
+      if (playbackSession !== session) return;
+      playbackSession = null;
+      playbackPaused = false;
+      updatePlaybackControls(`Speech stopped: ${message}`);
+      showError(`Text-to-Speech could not continue: ${message}`);
+    }
+  });
+  if (!started && playbackSession === session) {
+    playbackSession = null;
+    updatePlaybackControls();
+  }
 }
 
-function setAutoRead(enabled) {
-  state.storage.autoRead = Boolean(enabled);
-  saveAppState();
-  if (!state.storage.autoRead && autoReadSession) stopAutoRead({ message: 'Auto Read is off.' });
-  else updateAutoReadControls(state.storage.autoRead ? 'Auto Read is on. Start reading to continue through the sequence.' : 'Auto Read is off.');
+function getBankQuestions() {
+  return state.currentSubject ? getVisibleQuestions(state.currentSubject, FILTERS.ALL) : [];
+}
+
+function currentBankIndex(questions = getBankQuestions()) {
+  const index = questions.findIndex((question) => question.id === state.currentQuestionId);
+  return index >= 0 ? index : 0;
+}
+
+function readCurrent() {
+  const current = getCurrentQuestion();
+  if (current) startSequence([current], { label: 'Reading current question' });
+}
+
+function readFromHere() {
+  const questions = getBankQuestions();
+  if (questions.length) startSequence(questions.slice(currentBankIndex(questions)), { label: 'Reading from current question' });
+}
+
+function readAll() {
+  const questions = getBankQuestions();
+  if (questions.length) startSequence(questions, { label: 'Reading all questions' });
+}
+
+function readRange() {
+  const questions = getBankQuestions();
+  const end = Number(document.getElementById('rangeEnd').value);
+  const start = currentBankIndex(questions) + 1;
+  const validation = document.getElementById('rangeValidation');
+  let error = '';
+  if (!Number.isInteger(end)) error = 'Enter a whole number for the end question.';
+  else if (end < 1 || end > questions.length) error = `Choose an end question from 1 to ${questions.length}.`;
+  else if (end < start) error = `End question must be question ${start} or later, the current question.`;
+
+  if (validation) {
+    validation.textContent = error;
+    validation.classList.toggle('hidden', !error);
+  }
+  if (error) return;
+  startSequence(questions.slice(start - 1, end), { label: `Reading questions ${start} to ${end}` });
 }
 
 async function openSubject(subjectId, resume = true) {
-  stopAutoRead();
+  stopPlayback();
   try {
     showLoading('Loading questions...');
-    const normalized = normalizeId(subjectId);
-    await ensureSubjectData(normalized);
-    const subject = state.subjectData[normalized];
-    if (!subject || !subject.questions || !subject.questions.length) {
-      throw new Error('Unable to load questions. Please try again.');
-    }
+    const subject = getSubjectById(subjectId);
+    if (!subject) throw new Error('That technology is not in the subject catalog.');
+    await ensureSubjectData(subject.id);
+    const data = state.subjectData[subject.id];
+    if (!data?.questions?.length) throw new Error(`${subject.name} does not have any available questions.`);
 
-    state.currentSubject = normalized;
+    state.currentSubject = subject.id;
     state.currentFilter = FILTERS.ALL;
-    if (resume) {
-      setCurrentSubjectAndResume(normalized, FILTERS.ALL);
-    } else {
-      setCurrentQuestion(normalized, subject.questions[0].id, FILTERS.ALL);
-    }
+    if (resume) setCurrentSubjectAndResume(subject.id, FILTERS.ALL);
+    else setCurrentQuestion(subject.id, data.questions[0].id, FILTERS.ALL);
     hideError();
     showPracticeView();
+    setSpeechPanelExpanded(false);
     renderPractice();
-    updateAutoReadControls();
+    updateVoiceStatus();
+    updateAutoReadToggle();
   } catch (error) {
-    showError(error.message || 'Unable to load questions. Please try again.');
+    showHomeView();
+    showError(error.message || 'Unable to load this question bank. Please try again.');
   } finally {
     hideLoading();
   }
 }
 
 function finishPractice() {
-  stopAutoRead();
-  stopSpeech();
-  if (state.currentSubject) {
-    completeSubjectSession(state.currentSubject);
-  }
+  stopPlayback();
+  if (state.currentSubject) completeSubjectSession(state.currentSubject);
   renderSummary();
   showSummaryView();
 }
 
 function handleNext() {
   if (!state.currentSubject) return;
-  const wasAutoReading = Boolean(autoReadSession);
   const questions = getVisibleQuestions(state.currentSubject, state.currentFilter);
-  if (!questions.length) return;
-  const currentIndex = questions.findIndex((question) => question.id === state.currentQuestionId);
-  const nextIndex = currentIndex >= 0 ? currentIndex + 1 : 0;
-  if (nextIndex >= questions.length) {
+  const index = questions.findIndex((question) => question.id === state.currentQuestionId);
+  if (index < 0 || index + 1 >= questions.length) {
     finishPractice();
     return;
   }
-  const nextQuestion = questions[nextIndex];
-  if (wasAutoReading) stopAutoRead();
-  else stopSpeech();
-  setCurrentQuestion(state.currentSubject, nextQuestion.id, state.currentFilter);
-  renderPractice();
-  if (wasAutoReading) startAutoRead();
+  stopPlayback();
+  openPracticeAt(questions[index + 1]);
+  if (state.storage.autoRead) readFromHere();
 }
 
 function handlePrevious() {
   if (!state.currentSubject) return;
-  const wasAutoReading = Boolean(autoReadSession);
   const questions = getVisibleQuestions(state.currentSubject, state.currentFilter);
-  if (!questions.length) return;
-  const currentIndex = questions.findIndex((question) => question.id === state.currentQuestionId);
-  if (currentIndex <= 0) return;
-  const prevQuestion = questions[currentIndex - 1];
-  if (wasAutoReading) stopAutoRead();
-  else stopSpeech();
-  setCurrentQuestion(state.currentSubject, prevQuestion.id, state.currentFilter);
-  renderPractice();
-  if (wasAutoReading) startAutoRead();
+  const index = questions.findIndex((question) => question.id === state.currentQuestionId);
+  if (index <= 0) return;
+  stopPlayback();
+  openPracticeAt(questions[index - 1]);
+  if (state.storage.autoRead) readFromHere();
 }
 
 function applyFilter(filter) {
   if (!state.currentSubject) return;
-  stopAutoRead();
-  state.currentFilter = filter;
+  stopPlayback();
   const questions = getVisibleQuestions(state.currentSubject, filter);
   if (!questions.length) {
     showError(filter === FILTERS.BOOKMARKS ? 'No bookmarked questions yet.' : filter === FILTERS.WEAK ? 'No weak questions yet.' : 'No questions available.');
-    state.currentFilter = FILTERS.ALL;
     return;
   }
-  const firstQuestion = questions[0];
-  setCurrentQuestion(state.currentSubject, firstQuestion.id, filter);
+  state.currentFilter = filter;
+  setCurrentQuestion(state.currentSubject, questions[0].id, filter);
   hideError();
   renderPractice();
-  updateAutoReadControls();
 }
 
 document.addEventListener('click', async (event) => {
   const subjectButton = event.target.closest('.tech-card[data-subject]');
-  if (subjectButton && subjectButton.dataset.subject) {
+  if (subjectButton?.dataset.subject) {
     await openSubject(subjectButton.dataset.subject, true);
     return;
   }
 
   const resultButton = event.target.closest('.search-item');
   if (resultButton) {
-    stopAutoRead();
-    const subjectId = resultButton.dataset.subject || state.currentSubject;
+    stopPlayback();
     const questionId = resultButton.dataset.questionId;
-    if (subjectId && questionId) {
-      setCurrentQuestion(subjectId, questionId, state.currentFilter);
+    if (questionId && state.currentSubject) {
+      state.currentFilter = FILTERS.ALL;
+      setCurrentQuestion(state.currentSubject, questionId, FILTERS.ALL);
       document.getElementById('searchResults').classList.add('hidden');
       renderPractice();
-      updateAutoReadControls();
     }
     return;
   }
 
-  const retryButton = event.target.closest('#retryButton');
-  if (retryButton) {
-    if (state.currentSubject) {
-      await openSubject(state.currentSubject, true);
-    } else if (state.subjectCatalog.length) {
-      await openSubject(state.subjectCatalog[0].id, true);
-    } else {
-      showHomeView();
-    }
+  if (event.target.closest('#clearTechnologySearch')) {
+    const input = document.getElementById('technologySearchInput');
+    input.value = '';
+    renderHome();
+    input.focus();
+    return;
+  }
+
+  if (event.target.closest('#speechPanelToggle')) {
+    const toggle = document.getElementById('speechPanelToggle');
+    setSpeechPanelExpanded(toggle.getAttribute('aria-expanded') !== 'true');
+    return;
+  }
+
+  if (event.target.closest('#retryButton')) {
+    if (state.currentSubject) await openSubject(state.currentSubject, true);
+    else showHomeView();
     return;
   }
 
   if (event.target.closest('#themeButton')) {
-    const nextTheme = state.storage.theme === 'dark' ? 'light' : 'dark';
-    state.storage.theme = nextTheme;
-    document.documentElement.setAttribute('data-theme', nextTheme);
+    state.storage.theme = state.storage.theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', state.storage.theme);
     saveAppState();
-    const toggle = document.getElementById('themeButton');
-    if (toggle) toggle.textContent = nextTheme === 'dark' ? '☀️' : '🌙';
+    document.getElementById('themeButton').textContent = state.storage.theme === 'dark' ? '☀️' : '🌙';
     return;
   }
 
   if (event.target.closest('#backToHome') || event.target.closest('#backToHomeBtn')) {
-    stopAutoRead();
+    stopPlayback();
     state.currentSubject = null;
     state.currentQuestionId = null;
     showHomeView();
-    renderHome();
+    renderHome(document.getElementById('technologySearchInput').value);
     return;
   }
 
   if (event.target.closest('#practiceAgainBtn')) {
-    if (state.currentSubject) {
-      openSubject(state.currentSubject, true);
-    }
+    if (state.currentSubject) await openSubject(state.currentSubject, true);
     return;
   }
 
   if (event.target.closest('#bookmarkBtn')) {
-    if (!state.currentSubject || !state.currentQuestionId) return;
-    stopAutoRead();
-    toggleBookmark(state.currentSubject, state.currentQuestionId);
-    renderPractice();
-    updateAutoReadControls();
-    return;
-  }
-
-  if (event.target.closest('#weakQuestionBtn')) {
-    if (!state.currentSubject || !state.currentQuestionId) return;
-    stopAutoRead();
-    toggleWeak(state.currentSubject, state.currentQuestionId);
-    renderPractice();
-    updateAutoReadControls();
-    return;
-  }
-
-  if (event.target.closest('#allQuestionsBtn')) {
-    if (!state.currentSubject) return;
-    stopAutoRead();
-    state.currentFilter = FILTERS.ALL;
-    const firstQuestion = getVisibleQuestions(state.currentSubject, FILTERS.ALL)[0];
-    if (firstQuestion) {
-      setCurrentQuestion(state.currentSubject, firstQuestion.id, FILTERS.ALL);
+    if (state.currentSubject && state.currentQuestionId) {
+      stopPlayback();
+      toggleBookmark(state.currentSubject, state.currentQuestionId);
       renderPractice();
-      updateAutoReadControls();
     }
     return;
   }
 
-  if (event.target.closest('#bookmarksBtn')) {
-    applyFilter(FILTERS.BOOKMARKS);
+  if (event.target.closest('#weakQuestionBtn')) {
+    if (state.currentSubject && state.currentQuestionId) {
+      stopPlayback();
+      toggleWeak(state.currentSubject, state.currentQuestionId);
+      renderPractice();
+    }
     return;
   }
 
-  if (event.target.closest('#weakFilterBtn')) {
-    applyFilter(FILTERS.WEAK);
+  if (event.target.closest('#allQuestionsBtn')) {
+    const first = getBankQuestions()[0];
+    if (first) {
+      stopPlayback();
+      state.currentFilter = FILTERS.ALL;
+      openPracticeAt(first);
+    }
     return;
   }
+
+  if (event.target.closest('#bookmarksBtn')) return applyFilter(FILTERS.BOOKMARKS);
+  if (event.target.closest('#weakFilterBtn')) return applyFilter(FILTERS.WEAK);
 
   if (event.target.closest('#randomBtn')) {
-    if (!state.currentSubject) return;
-    stopAutoRead();
     const question = pickRandomQuestion(state.currentSubject, state.currentFilter);
     if (question) {
-      setCurrentQuestion(state.currentSubject, question.id, state.currentFilter);
-      renderPractice();
-      updateAutoReadControls();
+      stopPlayback();
+      openPracticeAt(question);
     }
     return;
   }
 
   if (event.target.closest('#readBtn')) {
     const current = getCurrentQuestion();
-    if (!current) return;
-    if (!canUseSpeech()) {
-      showError('Text-to-Speech is not supported in this browser.');
-      return;
-    }
-    hideError();
-    stopAutoRead();
-    speakEnglishText(current.answer, {
-      onError: (message) => showError(`Text-to-Speech could not read the English answer: ${message}`)
-    });
+    if (current) startSequence([current], { label: 'Reading answer', contentMode: 'answer' });
     return;
   }
-
+  if (event.target.closest('#readCurrentBtn')) return readCurrent();
   if (event.target.closest('#questionReadBtn')) {
     const current = getCurrentQuestion();
-    if (!current) return;
-    stopAutoRead();
-    hideError();
-    speakEnglishText(current.question, {
-      onError: (message) => showError(`Text-to-Speech could not read the English question: ${message}`)
-    });
+    if (current) startSequence([current], { label: 'Reading question', contentMode: 'question' });
     return;
   }
+  if (event.target.closest('#readFromHereBtn')) return readFromHere();
+  if (event.target.closest('#readAllBtn')) return readAll();
+  if (event.target.closest('#readRangeBtn')) return readRange();
 
-  if (event.target.closest('#startAutoReadBtn')) {
-    startAutoRead();
+  if (event.target.closest('#pauseSpeechBtn')) {
+    playbackPaused = pauseSpeech();
+    updatePlaybackControls(playbackPaused ? 'Speech paused.' : 'Speech could not be paused.');
     return;
   }
-
-  if (event.target.closest('#pauseAutoReadBtn')) {
-    if (autoReadSession && pauseSpeech()) {
-      autoReadSession.paused = true;
-      updateAutoReadControls();
-    } else if (autoReadSession) {
-      stopAutoRead({ message: 'Speech could not be paused in this browser.' });
-      showError('Speech could not be paused in this browser.');
-    }
+  if (event.target.closest('#resumeSpeechBtn')) {
+    playbackPaused = !resumeSpeech();
+    updatePlaybackControls(playbackPaused ? 'Speech could not be resumed.' : 'Speech resumed.');
     return;
   }
-
-  if (event.target.closest('#resumeAutoReadBtn')) {
-    if (autoReadSession && resumeSpeech()) {
-      const pendingQuestionId = autoReadSession.pendingQuestionId;
-      const pendingAnswerId = autoReadSession.pendingAnswerId;
-      autoReadSession.paused = false;
-      autoReadSession.pendingQuestionId = null;
-      autoReadSession.pendingAnswerId = null;
-      updateAutoReadControls();
-      if (pendingQuestionId) advanceAutoRead(pendingQuestionId, autoReadGeneration);
-      else if (pendingAnswerId) {
-        const question = getVisibleQuestions(autoReadSession.subjectId, autoReadSession.filter)
-          .find((entry) => entry.id === pendingAnswerId);
-        if (question) readAutoAnswer(question, autoReadGeneration);
-      }
-    } else if (autoReadSession) {
-      stopAutoRead({ message: 'Speech could not be resumed in this browser.' });
-      showError('Speech could not be resumed in this browser.');
-    }
-    return;
-  }
-
-  if (event.target.closest('#stopAutoReadBtn') || event.target.closest('#stopBtn')) {
-    stopAutoRead({ message: 'Auto Read stopped.' });
+  if (event.target.closest('#stopSpeechBtn')) {
+    stopPlayback('Speech stopped.');
     return;
   }
 
   if (event.target.closest('#prevBtn')) {
-    handlePrevious();
+    if (isSpeechPlaying() && moveSpeech(-1)) {
+      playbackPaused = false;
+      updatePlaybackControls();
+    } else handlePrevious();
     return;
   }
-
   if (event.target.closest('#nextBtn')) {
-    handleNext();
+    if (isSpeechPlaying() && moveSpeech(1)) {
+      playbackPaused = false;
+      updatePlaybackControls();
+    } else handleNext();
     return;
   }
-
   if (event.target.closest('#autoReadToggle')) {
-    setAutoRead(!state.storage.autoRead);
+    state.storage.autoRead = !state.storage.autoRead;
+    saveAppState();
+    updateAutoReadToggle();
   }
 });
 
 document.addEventListener('input', (event) => {
+  if (event.target.id === 'technologySearchInput') {
+    renderHome(event.target.value);
+    return;
+  }
   if (event.target.id !== 'searchInput' || !state.currentSubject) return;
-  stopAutoRead();
+  stopPlayback();
   const term = event.target.value.trim();
   if (!term) {
     document.getElementById('searchResults').classList.add('hidden');
     return;
   }
-  const results = performSearch(state.currentSubject, term);
-  renderSearchResults(results);
+  renderSearchResults(performSearch(state.currentSubject, term));
+});
+
+document.addEventListener('change', (event) => {
+  if (event.target.id === 'speechLanguage') {
+    stopPlayback();
+    state.storage.speechLanguage = event.target.value === 'mr-IN' ? 'mr-IN' : 'en-IN';
+    saveAppState();
+    updateVoiceStatus();
+    renderPractice();
+  } else if (event.target.id === 'speechSpeed') {
+    state.storage.speechRate = Number(event.target.value);
+    saveAppState();
+  } else if (event.target.id === 'englishPracticeMode') {
+    stopPlayback();
+    state.storage.englishPracticeMode = event.target.checked;
+    saveAppState();
+    renderPractice();
+    updateVoiceStatus();
+  }
 });
 
 document.addEventListener('keydown', (event) => {
@@ -477,40 +435,42 @@ document.addEventListener('keydown', (event) => {
     event.target.value = '';
     document.getElementById('searchResults').classList.add('hidden');
   }
+  if (event.target.id === 'technologySearchInput' && event.key === 'Escape') {
+    event.target.value = '';
+    renderHome();
+  }
 });
 
-window.addEventListener('pagehide', () => stopAutoRead());
+window.addEventListener('pagehide', () => {
+  stopPlayback();
+  unsubscribeVoices?.();
+});
 
 async function bootstrap() {
   initializeTheme();
-  const backgroundButton = document.getElementById('themeButton');
-  if (backgroundButton) backgroundButton.textContent = state.storage.theme === 'dark' ? '☀️' : '🌙';
-  updateAutoReadControls();
+  document.getElementById('themeButton').textContent = state.storage.theme === 'dark' ? '☀️' : '🌙';
+  document.getElementById('speechLanguage').value = state.storage.speechLanguage;
+  document.getElementById('speechSpeed').value = String(state.storage.speechRate);
+  updateAutoReadToggle();
+  updateVoiceStatus();
+  unsubscribeVoices = subscribeToVoices(() => updateVoiceStatus());
 
   try {
-    showLoading('Loading questions...');
-    const catalog = await fetch('./data/subjects.json').then((response) => {
-      if (!response.ok) throw new Error('Unable to load questions. Please try again.');
-      return response.json();
-    });
+    showLoading('Loading technology catalog...');
+    const response = await fetch('./data/subjects.json');
+    if (!response.ok) throw new Error('Unable to load the technology catalog. Please try again.');
+    const catalog = await response.json();
     state.subjectCatalog = Array.isArray(catalog) ? catalog : [];
-    for (const subject of state.subjectCatalog) {
-      await ensureSubjectData(subject.id);
-    }
+    const results = await Promise.allSettled(state.subjectCatalog.map((subject) => ensureSubjectData(subject.id)));
+    const failures = results.filter((result) => result.status === 'rejected');
     renderHome();
-    if (state.storage.lastSubject) {
-      const target = getSubjectById(state.storage.lastSubject);
-      if (target) {
-        await openSubject(target.id, true);
-      } else {
-        showHomeView();
-      }
-    } else {
-      showHomeView();
-    }
+    if (failures.length) showError(`${failures.length} question bank${failures.length === 1 ? '' : 's'} could not be loaded. Select a technology to retry.`);
+    const previousSubject = state.storage.lastSubject ? getSubjectById(state.storage.lastSubject) : null;
+    if (previousSubject) await openSubject(previousSubject.id, true);
+    else showHomeView();
   } catch (error) {
     showHomeView();
-    showError(error.message || 'Unable to load questions. Please try again.');
+    showError(error.message || 'Unable to load the technology catalog. Please try again.');
   } finally {
     hideLoading();
   }
@@ -518,7 +478,7 @@ async function bootstrap() {
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
+    navigator.serviceWorker.register('./sw.js').catch((error) => console.warn('Service worker registration failed:', error));
   });
 }
 

@@ -8,6 +8,11 @@ const EMPTY_STATE = {
   lastSubject: null,
   lastQuestion: {},
   autoRead: false,
+  speechLanguage: 'en-IN',
+  speechVoice: '',
+  speechVoiceLanguage: '',
+  speechRate: 1,
+  englishPracticeMode: false,
   theme: 'light',
   stats: {},
   visited: {}
@@ -30,6 +35,11 @@ export function getStorageState() {
       stats: parsed && typeof parsed.stats === 'object' ? parsed.stats : {},
       visited: parsed && typeof parsed.visited === 'object' ? parsed.visited : {},
       autoRead: Boolean(parsed && parsed.autoRead),
+      speechLanguage: parsed && parsed.speechLanguage === 'mr-IN' ? 'mr-IN' : 'en-IN',
+      speechVoice: typeof parsed?.speechVoice === 'string' ? parsed.speechVoice : '',
+      speechVoiceLanguage: parsed && ['en-IN', 'mr-IN'].includes(parsed.speechVoiceLanguage) ? parsed.speechVoiceLanguage : '',
+      speechRate: [0.75, 1, 1.25].includes(Number(parsed && parsed.speechRate)) ? Number(parsed.speechRate) : 1,
+      englishPracticeMode: Boolean(parsed && parsed.englishPracticeMode),
       theme: parsed && parsed.theme === 'dark' ? 'dark' : 'light'
     };
   } catch (error) {

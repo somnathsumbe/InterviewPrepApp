@@ -28,10 +28,12 @@ export function hideError() {
   if (error) error.classList.add('hidden');
 }
 
-export function renderHome() {
+export function renderHome(searchTerm = '') {
   const grid = document.getElementById('techGrid');
   if (!grid) return;
-  grid.innerHTML = state.subjectCatalog.map((subject) => {
+  const term = String(searchTerm || '').trim().toLocaleLowerCase();
+  const subjects = state.subjectCatalog.filter((subject) => subject.name.toLocaleLowerCase().includes(term));
+  grid.innerHTML = subjects.map((subject) => {
     const data = state.subjectData[subject.id] || { questions: [] };
     const count = data.questions ? data.questions.length : 0;
     return `
@@ -45,6 +47,10 @@ export function renderHome() {
       </button>
     `;
   }).join('');
+  const status = document.getElementById('technologySearchStatus');
+  if (status) status.textContent = term && !subjects.length ? 'No technologies found.' : '';
+  const clearButton = document.getElementById('clearTechnologySearch');
+  if (clearButton) clearButton.disabled = !term;
 }
 
 function renderOptions(question) {
@@ -73,8 +79,11 @@ export function renderPractice() {
   const bookmarked = isBookmarked(state.currentSubject, question.id);
   const weak = isWeak(state.currentSubject, question.id);
   const stats = getSubjectStats(state.currentSubject);
+  const subjectQuestions = state.subjectData[state.currentSubject]?.questions || [];
 
   document.getElementById('questionCounter').textContent = `Question ${currentIndex + 1} / ${total}`;
+  const countLabel = document.getElementById('practiceQuestionCount');
+  if (countLabel) countLabel.textContent = `${subjectQuestions.length} Questions`;
   document.getElementById('questionCategory').textContent = question.category || 'General';
   document.getElementById('techName').textContent = subjectName;
   document.getElementById('questionText').textContent = question.question;
@@ -87,7 +96,13 @@ export function renderPractice() {
   if (marathiAnswerText) {
     marathiAnswerText.textContent = question.answerMarathi || 'या प्रश्नासाठी मराठी भाषांतर उपलब्ध नाही.';
   }
-  document.getElementById('explanationText').textContent = question.explanation;
+  const explanationText = document.getElementById('explanationText');
+  const explanationWrap = document.getElementById('explanationWrap');
+  const isMarathiExplanation = /[\u0900-\u097f]/.test(question.explanation || '');
+  explanationText.textContent = question.explanation || '';
+  explanationText.lang = isMarathiExplanation ? 'mr' : 'en';
+  document.getElementById('explanationLabel').textContent = isMarathiExplanation ? 'अतिरिक्त स्पष्टीकरण' : 'Explanation';
+  explanationWrap.classList.toggle('hidden', !question.explanation);
   const optionsContainer = document.getElementById('optionsContainer');
   optionsContainer.innerHTML = renderOptions(question);
   optionsContainer.classList.toggle('hidden', !question.options.length);
@@ -117,6 +132,34 @@ export function renderPractice() {
   if (autoToggle) {
     autoToggle.textContent = `🔊 Auto Read Next: ${state.storage.autoRead ? 'ON' : 'OFF'}`;
     autoToggle.setAttribute('aria-pressed', String(state.storage.autoRead));
+  }
+  const practiceMode = document.getElementById('englishPracticeMode');
+  if (practiceMode) {
+    practiceMode.checked = Boolean(state.storage.englishPracticeMode);
+    marathiWrap?.classList.toggle('hidden', state.storage.englishPracticeMode);
+  }
+  const language = document.getElementById('speechLanguage');
+  if (language) {
+    language.value = state.storage.speechLanguage;
+    language.disabled = Boolean(state.storage.englishPracticeMode);
+  }
+  const readAnswerButton = document.getElementById('readBtn');
+  const questionReadButton = document.getElementById('questionReadBtn');
+  const speakMarathi = state.storage.speechLanguage === 'mr-IN' && !state.storage.englishPracticeMode;
+  if (questionReadButton) questionReadButton.textContent = speakMarathi ? '🔊 Read Marathi Answer' : '🔊 Read English Question';
+  if (readAnswerButton) {
+    readAnswerButton.textContent = speakMarathi
+      ? '🔊 Read Marathi Answer'
+      : '🔊 Read English Answer';
+  }
+  const speed = document.getElementById('speechSpeed');
+  if (speed) speed.value = String(state.storage.speechRate);
+  const rangeEnd = document.getElementById('rangeEnd');
+  const rangeSubjectChanged = rangeEnd && rangeEnd.dataset.subject !== state.currentSubject;
+  if (rangeEnd) {
+    rangeEnd.max = String(subjectQuestions.length);
+    if (rangeSubjectChanged) rangeEnd.value = '20';
+    rangeEnd.dataset.subject = state.currentSubject;
   }
 
   document.getElementById('themeButton').textContent = state.storage.theme === 'dark' ? '☀️' : '🌙';

@@ -68,6 +68,12 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 .muted, small { color: var(--muted); }
 .hero { text-align: center; padding: 32px 0 18px; }
 .hero h1 { margin: 0 0 8px; font-size: clamp(28px, 5vw, 44px); }
+.technology-search { display: flex; gap: 8px; max-width: 650px; margin: 0 auto 10px; }
+.technology-search input, .speech-settings select, .range-controls input {
+  min-width: 0; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px;
+}
+.technology-search input { flex: 1; }
+#technologySearchStatus:empty { display: none; }
 .grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; }
 .tech-card {
   min-height: 145px; width: 100%; text-align: center; padding: 22px 12px; border-radius: 16px; background: var(--surface); border: 1px solid var(--border); box-shadow: 0 6px 24px var(--shadow); display: flex; flex-direction: column; justify-content: space-between; align-items: center;
@@ -107,9 +113,11 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   margin-top: 22px; padding: 17px; background: var(--surface-strong); border-left: 4px solid var(--accent); border-radius: 10px; line-height: 1.65;
 }
 .answer strong { display: block; margin-bottom: 6px; }
+.answer #answerText, .marathi-answer > div, .explanation-block > div { white-space: pre-wrap; }
 .marathi-answer { margin-top: 14px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 9px; }
 .marathi-answer strong { margin-bottom: 6px; }
-.explanation { display: block; margin-top: 10px; color: var(--muted); }
+.explanation-block { margin-top: 12px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 9px; color: var(--muted); line-height: 1.7; }
+.explanation-block strong { display: block; margin-bottom: 5px; color: var(--text); }
 .code {
   margin-top: 16px; background: var(--code-bg); color: var(--code-text); padding: 16px; border-radius: 10px; white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; overflow-x: auto;
 }
@@ -118,6 +126,21 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 .readbar { justify-content: center; margin-top: 8px; }
 .auto-read-controls { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
 .auto-read-status { min-height: 1.25em; margin: 5px 0 10px; color: var(--muted); font-size: 13px; }
+.speech-panel { margin: 12px 0; padding: 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+.speech-panel-toggle { display: flex; width: 100%; align-items: center; justify-content: space-between; font-weight: 700; text-align: left; }
+.speech-panel-toggle span { font-size: 18px; line-height: 1; }
+#speechPanelContent { padding-top: 12px; }
+.speech-settings, .speech-actions, .range-controls { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; }
+.speech-settings { margin-bottom: 10px; }
+.speech-settings label, .range-controls label { display: grid; gap: 5px; color: var(--muted); font-size: 13px; }
+.speech-settings select { min-width: 155px; }
+.practice-mode { display: flex !important; align-items: center; gap: 8px !important; align-self: center; }
+.practice-mode input { width: 18px; height: 18px; accent-color: var(--accent); }
+.speech-actions { margin-bottom: 10px; }
+.speech-actions button, .range-controls button { flex: 1 1 auto; }
+.range-controls input { width: 115px; }
+.answer .marathi-answer { line-height: 1.8; }
+.marathi-answer [lang="mr"], [lang="mr"] { font-family: "Noto Sans Devanagari", "Nirmala UI", Mangal, system-ui, sans-serif; }
 .summary { text-align: center; padding: 55px 25px; margin-top: 40px; }
 .big { font-size: 55px; }
 .footer { text-align: center; margin: 25px; color: var(--muted); font-size: 12px; }
@@ -132,6 +155,9 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   .question { padding: 20px; min-height: 0; }
   .toprow, .toolbar, .nav { flex-direction: column; align-items: stretch; }
   .auto-read-controls { justify-content: flex-start; }
+  .speech-settings, .speech-actions, .range-controls { align-items: stretch; }
+  .speech-settings > label, .range-controls > label { flex: 1 1 145px; }
+  .speech-settings select { width: 100%; }
   .wrap { padding: 12px; }
 }
 @media (max-width: 430px) {
@@ -141,4 +167,7 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   .nav button { padding: 9px 7px; font-size: 13px; }
   .tools { gap: 6px; }
   .tools button { flex: 1 1 calc(50% - 6px); }
+  .technology-search { flex-wrap: wrap; }
+  .technology-search input { flex-basis: 100%; }
+  .speech-actions button { flex: 1 1 calc(50% - 10px); }
 }

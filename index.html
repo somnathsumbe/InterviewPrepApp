@@ -30,6 +30,12 @@
             <h1>Choose Technology</h1>
             <p class="muted">Select a technology and practice questions one by one.</p>
           </div>
+          <div class="technology-search">
+            <label for="technologySearchInput" class="sr-only">Search technologies</label>
+            <input id="technologySearchInput" type="search" placeholder="Search technology (React, Angular, RxJS...)" autocomplete="off" aria-controls="techGrid">
+            <button id="clearTechnologySearch" type="button" aria-label="Clear technology search">Clear</button>
+          </div>
+          <p id="technologySearchStatus" class="muted" role="status" aria-live="polite"></p>
           <div id="techGrid" class="grid" aria-live="polite"></div>
         </section>
 
@@ -39,15 +45,52 @@
               <button id="backToHome" type="button">← Technologies</button>
               <span id="techName" class="muted"></span>
             </div>
-            <div class="auto-read-controls" aria-label="Auto read controls">
-              <button id="autoReadToggle" type="button" aria-label="Auto Read Next Question" aria-pressed="false">🔊 Auto Read Next: OFF</button>
-              <button id="startAutoReadBtn" class="primary" type="button">Start Auto Read</button>
-              <button id="pauseAutoReadBtn" type="button" class="hidden" disabled>Pause</button>
-              <button id="resumeAutoReadBtn" type="button" class="hidden" disabled>Resume</button>
-              <button id="stopAutoReadBtn" type="button" class="hidden" disabled>Stop</button>
-            </div>
+            <span id="practiceQuestionCount" class="muted"></span>
           </div>
-          <p id="autoReadStatus" class="auto-read-status" role="status" aria-live="polite"></p>
+          <section class="speech-panel" aria-label="Speech settings and playback">
+            <button id="speechPanelToggle" class="speech-panel-toggle" type="button" aria-expanded="false" aria-controls="speechPanelContent">
+              Speech Settings <span id="speechPanelChevron" aria-hidden="true">⌄</span>
+            </button>
+            <div id="speechPanelContent" class="hidden">
+              <div class="speech-settings">
+                <label>Speech language
+                  <select id="speechLanguage">
+                    <option value="en-IN">English (India)</option>
+                    <option value="mr-IN">मराठी (भारत)</option>
+                  </select>
+                </label>
+                <label>Speed
+                  <select id="speechSpeed">
+                    <option value="0.75">Slow (0.75×)</option>
+                    <option value="1">Medium (1.0×)</option>
+                    <option value="1.25">Fast (1.25×)</option>
+                  </select>
+                </label>
+                <label class="practice-mode">
+                  <input id="englishPracticeMode" type="checkbox">
+                  English Practice Mode
+                </label>
+              </div>
+              <p id="voiceStatus" class="auto-read-status" role="status" aria-live="polite"></p>
+              <div class="speech-actions">
+                <button id="autoReadToggle" type="button" aria-pressed="false">Auto Read Next: OFF</button>
+                <button id="readCurrentBtn" class="primary" type="button">▶ Play / Read Current Question</button>
+                <button id="readFromHereBtn" type="button">Read From Here to End</button>
+                <button id="readAllBtn" type="button">Read All Questions</button>
+                <button id="pauseSpeechBtn" type="button" disabled>Pause</button>
+                <button id="resumeSpeechBtn" type="button" disabled>Resume</button>
+                <button id="stopSpeechBtn" type="button" disabled>Stop</button>
+              </div>
+              <div class="range-controls">
+                <label>End question
+                  <input id="rangeEnd" type="number" min="1" value="20" inputmode="numeric">
+                </label>
+                <button id="readRangeBtn" type="button">Read Selected Range</button>
+              </div>
+              <p id="speechStatus" class="auto-read-status" role="status" aria-live="polite"></p>
+              <p id="rangeValidation" class="error hidden" role="alert"></p>
+            </div>
+          </section>
 
           <div class="searchbox">
             <label for="searchInput" class="sr-only">Search questions</label>
@@ -93,10 +136,14 @@
               <strong>✅ ENGLISH ANSWER</strong>
               <div id="answerText"></div>
               <div id="marathiAnswerWrap" class="marathi-answer" lang="mr">
-                <strong>मराठीत समजून घ्या</strong>
+                <strong>मराठी उत्तर</strong>
                 <div id="answerTextMarathi"></div>
               </div>
-              <span id="explanationText" class="explanation"></span>
+            </div>
+
+            <div id="explanationWrap" class="explanation-block hidden">
+              <strong id="explanationLabel">Explanation</strong>
+              <div id="explanationText"></div>
             </div>
 
             <div id="exampleWrap" class="hidden">
@@ -107,12 +154,8 @@
 
           <div class="nav">
             <button id="prevBtn" type="button">← Previous</button>
-            <button id="readBtn" class="primary" type="button">🔊 Read English Answer</button>
+            <button id="readBtn" class="primary" type="button">🔊 Read Current Question</button>
             <button id="nextBtn" class="primary" type="button">Next →</button>
-          </div>
-
-          <div class="actions readbar">
-            <button id="stopBtn" type="button">■ Stop Reading</button>
           </div>
         </section>
 

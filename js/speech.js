@@ -4,7 +4,13 @@ let activeUtterance = null;
 let playback = null;
 let generation = 0;
 let voicesChangedHandler = null;
+let voicesChangedPropertyHandler = null;
+let voiceLoadTimer = null;
 const voiceSubscribers = new Set();
+
+function normalizeLanguageTag(language) {
+  return String(language || '').toLowerCase().replace(/_/g, '-');
+}
 
 export function canUseSpeech() {
   return typeof window !== 'undefined'
@@ -20,33 +26,80 @@ export function getSpeechVoices() {
 }
 
 export function getVoicesForLanguage(language) {
-  const prefix = String(language || '').toLowerCase().split('-')[0];
-  return getSpeechVoices().filter((voice) => voice.lang.toLowerCase().split('-')[0] === prefix);
+  const requested = normalizeLanguageTag(language).split('-');
+  const compatible = getSpeechVoices().filter((voice) => {
+    const parts = normalizeLanguageTag(voice.lang).split('-');
+    if (requested[0] === 'mr') return parts[0] === 'mr';
+    return parts[0] === 'en';
+  });
+  return compatible.sort((first, second) => {
+    const exact = normalizeLanguageTag(language);
+    const firstLang = normalizeLanguageTag(first.lang);
+    const secondLang = normalizeLanguageTag(second.lang);
+    const firstIndian = firstLang === exact || firstLang.startsWith(`${exact}-`);
+    const secondIndian = secondLang === exact || secondLang.startsWith(`${exact}-`);
+    return Number(secondIndian) - Number(firstIndian);
+  });
+}
+
+export function getPreferredVoice(language) {
+  const voices = getVoicesForLanguage(language);
+  if (normalizeLanguageTag(language).startsWith('mr')) {
+    return voices.find((voice) => normalizeLanguageTag(voice.lang) === 'mr-in')
+      || voices.find((voice) => normalizeLanguageTag(voice.lang).startsWith('mr-in-'))
+      || voices[0]
+      || null;
+  }
+  return voices.find((voice) => normalizeLanguageTag(voice.lang) === 'en-in')
+    || voices.find((voice) => normalizeLanguageTag(voice.lang).startsWith('en-in-'))
+    || voices[0]
+    || null;
+}
+
+function onVoicesChanged() {
+  const voices = getSpeechVoices();
+  voiceSubscribers.forEach((subscriber) => subscriber(voices));
+  if (!playback?.waitingForVoice) return;
+  const voice = getPreferredVoice(playback.language);
+  if (!voice) return;
+  clearTimeout(voiceLoadTimer);
+  voiceLoadTimer = null;
+  playback.waitingForVoice = false;
+  speakNext(playback.token);
 }
 
 export function subscribeToVoices(callback) {
   if (typeof callback !== 'function') return () => {};
   voiceSubscribers.add(callback);
   if (!voicesChangedHandler && canUseSpeech()) {
-    voicesChangedHandler = () => voiceSubscribers.forEach((subscriber) => subscriber(getSpeechVoices()));
-    window.speechSynthesis.addEventListener('voiceschanged', voicesChangedHandler);
+    voicesChangedHandler = onVoicesChanged;
+    if (typeof window.speechSynthesis.addEventListener === 'function') {
+      window.speechSynthesis.addEventListener('voiceschanged', voicesChangedHandler);
+    } else {
+      voicesChangedPropertyHandler = window.speechSynthesis.onvoiceschanged;
+      window.speechSynthesis.onvoiceschanged = (event) => {
+        voicesChangedPropertyHandler?.call(window.speechSynthesis, event);
+        onVoicesChanged();
+      };
+    }
   }
+  callback(getSpeechVoices());
   return () => {
     voiceSubscribers.delete(callback);
     if (!voiceSubscribers.size && voicesChangedHandler && canUseSpeech()) {
-      window.speechSynthesis.removeEventListener('voiceschanged', voicesChangedHandler);
+      if (typeof window.speechSynthesis.removeEventListener === 'function') {
+        window.speechSynthesis.removeEventListener('voiceschanged', voicesChangedHandler);
+      } else {
+        window.speechSynthesis.onvoiceschanged = voicesChangedPropertyHandler || null;
+        voicesChangedPropertyHandler = null;
+      }
       voicesChangedHandler = null;
     }
   };
 }
 
 function chooseVoice(language) {
-  const matches = getVoicesForLanguage(language);
-  if (language === 'mr-IN') return matches.find((voice) => /^mr-in$/i.test(voice.lang)) || matches[0] || null;
-  return matches.find((voice) => /^en-in$/i.test(voice.lang))
-    || matches.find((voice) => /^en-/i.test(voice.lang))
-    || matches[0]
-    || null;
+  return getPreferredVoice(language);
 }
 
 function makeQuestionText(question, language) {
@@ -74,6 +127,7 @@ function finishPlayback(token) {
 function speakNext(token) {
   if (!playback || playback.token !== token) return;
   const current = playback;
+  if (current.waitingForVoice) return;
   if (current.cursor >= current.items.length) {
     finishPlayback(token);
     return;
@@ -92,22 +146,31 @@ function speakNext(token) {
     return;
   }
 
+  const voice = chooseVoice(current.language);
+  if (!voice) {
+    current.waitingForVoice = true;
+    current.onVoicePending?.(current.language);
+    voiceLoadTimer = setTimeout(() => {
+      if (!playback || playback.token !== token || !playback.waitingForVoice) return;
+      playback = null;
+      voiceLoadTimer = null;
+      current.onError?.(current.language === 'mr-IN'
+        ? 'No Marathi (mr-IN) speech voice is available. Install or enable a Marathi speech voice in your operating system or browser, then try again.'
+        : 'No English speech voice is available. Install or enable an English speech voice in your operating system or browser, then try again.');
+    }, 3000);
+    return;
+  }
+
   current.onItemStart?.(item, current.cursor, current.items.length);
   try {
     const utterance = new window.SpeechSynthesisUtterance(text);
-    const voice = chooseVoice(current.language);
-    if (!voice) {
-      playback = null;
-      current.onError?.(current.language === 'mr-IN'
-        ? 'No Marathi speech voice is available. Install a Marathi voice on your device to use Marathi playback.'
-        : 'No English speech voice is available on this device.');
-      return;
-    }
     utterance.lang = voice.lang;
     utterance.voice = voice;
     utterance.rate = [0.75, 1, 1.25].includes(Number(state.storage.speechRate))
       ? Number(state.storage.speechRate)
       : current.rate;
+    utterance.pitch = 1;
+    utterance.volume = 1;
     utterance.onend = () => {
       if (!playback || playback.token !== token || activeUtterance !== utterance) return;
       activeUtterance = null;
@@ -134,6 +197,7 @@ export function startSpeechSequence(items, {
   language = state.storage.speechLanguage,
   rate = state.storage.speechRate,
   onItemStart = () => {},
+  onVoicePending = () => {},
   onEnd = () => {},
   onError = () => {}
 } = {}) {
@@ -154,6 +218,7 @@ export function startSpeechSequence(items, {
     language: language === 'mr-IN' ? 'mr-IN' : 'en-IN',
     rate: [0.75, 1, 1.25].includes(Number(rate)) ? Number(rate) : 1,
     onItemStart,
+    onVoicePending,
     onEnd,
     onError
   };
@@ -164,6 +229,8 @@ export function startSpeechSequence(items, {
 export function stopSpeech() {
   generation += 1;
   playback = null;
+  clearTimeout(voiceLoadTimer);
+  voiceLoadTimer = null;
   if (activeUtterance) {
     activeUtterance.onend = null;
     activeUtterance.onerror = null;

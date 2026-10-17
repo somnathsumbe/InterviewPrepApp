@@ -5,10 +5,11 @@ import { showHomeView, showPracticeView, showSummaryView } from './router.js';
 import { ensureSubjectData, getSubjectById, getCurrentQuestion, getVisibleQuestions, setCurrentQuestion, setCurrentSubjectAndResume, pickRandomQuestion } from './question-engine.js';
 import { performSearch } from './search.js';
 import { completeSubjectSession, getSubjectStats, toggleBookmark, toggleWeak } from './statistics.js';
-import { canUseSpeech, getSpeechVoices, getVoicesForLanguage, subscribeToVoices, startSpeechSequence, stopSpeech, pauseSpeech, resumeSpeech, moveSpeech, isSpeechPlaying } from './speech.js';
+import { canUseSpeech, getSpeechVoices, getPreferredVoice, subscribeToVoices, startSpeechSequence, stopSpeech, pauseSpeech, resumeSpeech, moveSpeech, isSpeechPlaying } from './speech.js';
 
 let playbackSession = null;
 let playbackPaused = false;
+let speechWaitingForVoice = false;
 let unsubscribeVoices = null;
 
 function updatePlaybackControls(message = '') {
@@ -16,7 +17,7 @@ function updatePlaybackControls(message = '') {
   const pause = document.getElementById('pauseSpeechBtn');
   const resume = document.getElementById('resumeSpeechBtn');
   const stop = document.getElementById('stopSpeechBtn');
-  if (pause) pause.disabled = !active || playbackPaused;
+  if (pause) pause.disabled = !active || playbackPaused || speechWaitingForVoice;
   if (resume) resume.disabled = !active || !playbackPaused;
   if (stop) stop.disabled = !active;
   const status = document.getElementById('speechStatus');
@@ -26,6 +27,7 @@ function updatePlaybackControls(message = '') {
 function stopPlayback(message = '') {
   playbackSession = null;
   playbackPaused = false;
+  speechWaitingForVoice = false;
   stopSpeech();
   updatePlaybackControls(message);
 }
@@ -33,24 +35,31 @@ function stopPlayback(message = '') {
 function updateVoiceStatus() {
   const status = document.getElementById('voiceStatus');
   if (!status) return;
+  if (!canUseSpeech()) {
+    status.textContent = 'Text-to-Speech is not supported in this browser.';
+    return;
+  }
 
   const language = state.storage.englishPracticeMode ? 'en-IN' : state.storage.speechLanguage;
-  const voices = getVoicesForLanguage(language);
-  const preferred = language === 'mr-IN'
-    ? voices.find((voice) => /^mr-in$/i.test(voice.lang)) || voices[0]
-    : voices.find((voice) => /^en-in$/i.test(voice.lang));
-
-  if (!getSpeechVoices().length) {
-    status.textContent = 'This browser has not provided any speech voices yet.';
-  } else if (language === 'mr-IN' && !preferred) {
-    status.textContent = 'No Marathi speech voice is available. Marathi playback is unavailable on this device.';
-  } else if (language === 'en-IN' && !preferred) {
-    status.textContent = voices.length
-      ? `No Indian English voice is available. English playback will use ${voices[0].name} (${voices[0].lang}).`
-      : 'No English speech voice is available on this device.';
-  } else {
-    status.textContent = `${preferred.name} (${preferred.lang}) selected automatically.`;
-  }
+  const voices = getSpeechVoices();
+  const englishVoice = getPreferredVoice('en-IN');
+  const marathiVoice = getPreferredVoice('mr-IN');
+  const preferred = language === 'mr-IN' ? marathiVoice : englishVoice;
+  const isIndianEnglish = englishVoice
+    && /^en[-_]in(?:$|[-_])/i.test(englishVoice.lang);
+  const availableStatus = voices.length
+    ? `English (India) en-IN: ${isIndianEnglish ? `available (${englishVoice.name})` : 'unavailable'}${englishVoice && !isIndianEnglish ? `; English fallback available (${englishVoice.name}, ${englishVoice.lang})` : ''}. Marathi mr-IN: ${marathiVoice ? `available (${marathiVoice.name}, ${marathiVoice.lang})` : 'unavailable'}.`
+    : 'Waiting for speech voices from the browser.';
+  const selectedStatus = preferred
+    ? language === 'mr-IN'
+      ? `Marathi voice selected: ${preferred.name} (${preferred.lang}).`
+      : isIndianEnglish
+        ? `Indian English voice selected: ${preferred.name} (${preferred.lang}).`
+        : `Indian English is not installed. Using the available English voice ${preferred.name} (${preferred.lang}); install an en-IN voice for Indian pronunciation.`
+    : language === 'mr-IN'
+      ? 'Marathi speech is unavailable. Install or enable a Marathi speech voice in your operating system or browser; English will not be used for Marathi.'
+      : 'No English speech voice is available. Install or enable a voice in your operating system or browser.';
+  status.textContent = `${availableStatus} ${selectedStatus}`;
   if (state.storage.englishPracticeMode) status.textContent = `English Practice Mode forces English speech. ${status.textContent}`;
 }
 
@@ -99,8 +108,15 @@ function startSequence(questions, { label = 'Reading questions', contentMode = '
   const started = startSpeechSequence(sequence, {
     language: state.storage.englishPracticeMode ? 'en-IN' : state.storage.speechLanguage,
     rate: state.storage.speechRate,
+    onVoicePending: (language) => {
+      speechWaitingForVoice = true;
+      const status = document.getElementById('voiceStatus');
+      if (status) status.textContent = `Waiting for an available ${language === 'mr-IN' ? 'Marathi' : 'Indian English'} voice...`;
+      updatePlaybackControls();
+    },
     onItemStart: (question) => {
       if (playbackSession !== session || state.currentSubject !== subjectId) return;
+      speechWaitingForVoice = false;
       state.currentFilter = FILTERS.ALL;
       openPracticeAt(question);
       const all = getVisibleQuestions(subjectId, FILTERS.ALL);
@@ -113,13 +129,16 @@ function startSequence(questions, { label = 'Reading questions', contentMode = '
       if (playbackSession !== session) return;
       playbackSession = null;
       playbackPaused = false;
+      speechWaitingForVoice = false;
       updatePlaybackControls('Reading complete.');
     },
     onError: (message) => {
       if (playbackSession !== session) return;
       playbackSession = null;
       playbackPaused = false;
+      speechWaitingForVoice = false;
       updatePlaybackControls(`Speech stopped: ${message}`);
+      updateVoiceStatus();
       showError(`Text-to-Speech could not continue: ${message}`);
     }
   });
